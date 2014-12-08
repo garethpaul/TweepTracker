@@ -19,7 +19,6 @@ func FindTweeps(completion: (result: [String]) -> Void) {
     // Setup endpoint URL
     let memberListAPI = "https://api.twitter.com/1.1/lists/members.json"
 
-
     // Setup Params to be sent to the endpoint.
     let params = ["slug": "twitter-dev-advocates", "owner_screen_name": "twitterdev"]
 
