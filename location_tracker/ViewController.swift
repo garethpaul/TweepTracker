@@ -172,7 +172,21 @@ class ViewController: UIViewController, MKMapViewDelegate {
             self.mapView.hidden = false;
             self.spinner.hidden = true;
 
+
+            let delay = 60 * Double(NSEC_PER_SEC)
+            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+            self.refresh.hidden = true
+            dispatch_after(time, dispatch_get_main_queue()) {
+                //call the method which have the steps after delay.
+                self.displayRefresh()
+            }
+
+
         }
+    }
+
+    func displayRefresh(){
+        self.refresh.hidden = false
     }
 
 

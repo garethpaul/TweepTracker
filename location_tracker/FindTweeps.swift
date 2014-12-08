@@ -62,15 +62,10 @@ func FindTweeps(completion: (result: [String]) -> Void) {
                 }
 
                 // The list of developer advocates is somewhat limited here are some more to append to our array
-                userArray.append("jcipriano")
-                userArray.append("joncipriano")
-                userArray.append("davelester")
-                userArray.append("lfcipriani")
-                userArray.append("ktopenn")
                 userArray.append("logicalarthur")
                 userArray.append("laurenschutte")
-                userArray.append("beardigsit")
                 userArray.append("noonisms")
+                userArray.append("jeffseibert")
 
                 // On completed send the userArray back to the ViewController.
                 completion(result: userArray)
