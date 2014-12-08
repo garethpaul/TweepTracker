@@ -16,43 +16,33 @@ func TweepPicture(handle: String, completion: (result: String) -> Void) {
     var clientError : NSError?
     Twitter.initialize()
     let completed = false
+    let request = Twitter.sharedInstance().APIClient.URLRequestWithMethod("GET", URL:  statusesShowEndpoint, parameters: params, error:&clientError)
 
-    Twitter.sharedInstance().logInWithCompletion{
-        (session, error) -> Void in
-        if (session != nil) {
-            //println("signed in as \(session.userName)");
-            /// go
-            let request = Twitter.sharedInstance().APIClient.URLRequestWithMethod("GET", URL:  statusesShowEndpoint, parameters: params, error:&clientError)
-
-            if request != nil {
-                println("request is not nil")
-                Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
-                    (response, data, connectionError) -> Void in
-                    if (connectionError == nil) {
-                        var jsonError : NSError?
-                        let json : AnyObject? =
-                        NSJSONSerialization.JSONObjectWithData(data,
-                            options: nil,
-                            error: &jsonError)
-                        let profile_image_url = json!["profile_image_url"] as? String
-                        completion(result: String(profile_image_url!))
-                    }
-
-                    else {
-                        println("Error: \(connectionError)")
-                    }
-                }
+    if request != nil {
+        println("request is not nil")
+        Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
+            (response, data, connectionError) -> Void in
+            if (connectionError == nil) {
+                var jsonError : NSError?
+                let json : AnyObject? =
+                NSJSONSerialization.JSONObjectWithData(data,
+                    options: nil,
+                    error: &jsonError)
+                let profile_image_url = json!["profile_image_url"] as? String
+                completion(result: String(profile_image_url!))
             }
+
             else {
-                println("Error: \(clientError)")
+                println("Error: \(connectionError)")
             }
-
-        } else {
-            println("error: \(error.localizedDescription)");
         }
-
     }
+    else {
+        println("Error: \(clientError)")
+    }
+
 }
+
 
 
 
