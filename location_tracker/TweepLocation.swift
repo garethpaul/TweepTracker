@@ -57,6 +57,7 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
                                     // if geo is not null
                                     if json_dict["geo"] != nil {
 
+                                        // get the value from {"geo": {"coordinates".....
                                         if let geo = json_dict["geo"] as? JSONDictionary{
 
                                             // handle the coordinates
