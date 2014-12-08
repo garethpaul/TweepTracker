@@ -15,6 +15,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
     
     @IBOutlet var spinner: UIActivityIndicatorView!
 
+    @IBOutlet var refresh: UIImageView!
     @IBOutlet var search: UIImageView!
 
 
@@ -37,6 +38,13 @@ class ViewController: UIViewController, MKMapViewDelegate {
         let searchTapRecognizer = UITapGestureRecognizer(target: self, action: Selector("searchTap"))
         self.search.userInteractionEnabled = true
         self.search.addGestureRecognizer(searchTapRecognizer)
+
+
+        //
+        //
+        let refreshTapRecognizer = UITapGestureRecognizer(target: self, action: Selector("refreshTap"))
+        self.refresh.userInteractionEnabled = true
+        self.refresh.addGestureRecognizer(refreshTapRecognizer)
 
         // Customize the navigation bar.
         let titleDict: NSDictionary = [NSForegroundColorAttributeName: toColor("4DD962")]
@@ -84,6 +92,9 @@ class ViewController: UIViewController, MKMapViewDelegate {
         println("search-tap")
     }
 
+    func refreshTap(){
+        setupMap()
+    }
 
     func newPin(url: String){
 
@@ -134,7 +145,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
 
     func setupMap(){
+        self.spinner.hidden = false
         self.spinner.startAnimating()
+        self.mapView.hidden = true
+
         let location = CLLocationCoordinate2D(
             latitude: 51.48881507,
             longitude:-0.16875179
