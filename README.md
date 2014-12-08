@@ -7,6 +7,6 @@ You will need
 
 Fabric.app via Fabric.io to setup this project.
 
-Please use the app to walk through adding the TwitterKit.
+Please use the app to walk through adding the TwitterKit and Crashlytics.
 
 Reach out to support@fabric.io with questions.. 
