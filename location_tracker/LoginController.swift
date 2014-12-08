@@ -13,20 +13,10 @@ class LoginController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-
         // Do any additional setup after loading the view, typically from a nib.
 
-        let logInButton = TWTRLogInButton(logInCompletion: {
-            (session: TWTRSession!, error: NSError!) in
-            // play with Twitter session
-            
-            self.performSegueWithIdentifier("ViewController", sender: self)
-
-        })
-        logInButton.center = self.view.center
-        self.view.addSubview(logInButton)
-
+        // Setup Login Button.
+        setupLogin()
 
     }
 
@@ -35,8 +25,16 @@ class LoginController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    func setupLogin(){
+        let logInButton = TWTRLogInButton(logInCompletion: {
+            (session: TWTRSession!, error: NSError!) in
+            // play with Twitter session
 
+            self.performSegueWithIdentifier("ViewController", sender: self)
 
-    
+        })
+        logInButton.center = self.view.center
+        self.view.addSubview(logInButton)
+    }
 }
 

@@ -5,6 +5,9 @@
 import Foundation
 import UIKit
 
+
+// Concerts a hex string into a UIColor
+//
 func toColor (hex:String) -> UIColor {
     var cString:String = hex.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet() as NSCharacterSet).uppercaseString
 
