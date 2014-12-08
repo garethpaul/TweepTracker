@@ -21,6 +21,7 @@
 		FD6FE3DB1A342BC700BFDFFB /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6FE3DA1A342BC700BFDFFB /* LoginController.swift */; };
 		FD6FE3DD1A34388A00BFDFFB /* TweepLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6FE3DC1A34388A00BFDFFB /* TweepLocation.swift */; };
 		FD9B2DBA1A33CAB2009BF4F9 /* URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD9B2DB91A33CAB2009BF4F9 /* URL.swift */; };
+		FDA60BD61A35730E00E5B139 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDA60BD51A35730E00E5B139 /* Crashlytics.framework */; };
 		FDF285551A33B3F00071257C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDF285541A33B3F00071257C /* AppDelegate.swift */; };
 		FDF285571A33B3F00071257C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDF285561A33B3F00071257C /* ViewController.swift */; };
 		FDF2855C1A33B3F00071257C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FDF2855B1A33B3F00071257C /* Images.xcassets */; };
@@ -53,6 +54,7 @@
 		FD6FE3DA1A342BC700BFDFFB /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 		FD6FE3DC1A34388A00BFDFFB /* TweepLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TweepLocation.swift; sourceTree = "<group>"; };
 		FD9B2DB91A33CAB2009BF4F9 /* URL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
+		FDA60BD51A35730E00E5B139 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		FDF2854F1A33B3F00071257C /* location_tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = location_tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FDF285531A33B3F00071257C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FDF285541A33B3F00071257C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -74,6 +76,7 @@
 				FD6FE3D91A342B9A00BFDFFB /* Fabric.framework in Frameworks */,
 				FD1F67E41A33DCDF006C66BE /* MapKit.framework in Frameworks */,
 				FDF285751A33B6BB0071257C /* CoreLocation.framework in Frameworks */,
+				FDA60BD61A35730E00E5B139 /* Crashlytics.framework in Frameworks */,
 				FD6FE3D71A342B9A00BFDFFB /* TwitterKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -91,6 +94,7 @@
 		FDF285461A33B3F00071257C = {
 			isa = PBXGroup;
 			children = (
+				FDA60BD51A35730E00E5B139 /* Crashlytics.framework */,
 				FD6FE3D41A342B9A00BFDFFB /* TwitterKit.framework */,
 				FD6FE3D51A342B9A00BFDFFB /* TwitterKitResources.bundle */,
 				FD6FE3D61A342B9A00BFDFFB /* Fabric.framework */,

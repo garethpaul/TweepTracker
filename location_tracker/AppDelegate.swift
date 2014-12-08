@@ -6,6 +6,7 @@ import UIKit
 import CoreLocation
 import Fabric
 import TwitterKit
+import Crashlytics
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -19,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.sharedApplication().statusBarStyle = UIStatusBarStyle.LightContent;
 
         // Override point for customization after application launch.
-        Fabric.with([Twitter()])
+        Fabric.with([Twitter(), Crashlytics()])
 
         // Check if the user is logged in or not to present the sign in screen.
         if Twitter.sharedInstance().session() == nil {
