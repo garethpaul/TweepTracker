@@ -66,6 +66,7 @@ func FindTweeps(completion: (result: [String]) -> Void) {
                 userArray.append("laurenschutte")
                 userArray.append("noonisms")
                 userArray.append("jeffseibert")
+                userArray.append("josolennoso")
 
                 // On completed send the userArray back to the ViewController.
                 completion(result: userArray)
