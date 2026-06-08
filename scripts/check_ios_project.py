@@ -73,12 +73,36 @@ def check_resources_parse():
         json.loads(path.read_text(encoding="utf-8"))
 
 
+def check_twitter_json_guards():
+    location = read_text("location_tracker/TweepLocation.swift")
+    picture = read_text("location_tracker/TweepPicture.swift")
+
+    require('json![0]["geo"]' not in location, "timeline JSON must not force-unwrap the first tweet")
+    require(
+        'geo["coordinates"]!' not in location,
+        "coordinate JSON must not force-unwrap the coordinates array",
+    )
+    require(
+        "coordinates.count >= 2" in location,
+        "coordinate JSON must verify latitude and longitude are present",
+    )
+    require(
+        "profile_image_url!" not in picture,
+        "profile image JSON must not force-unwrap the profile image URL",
+    )
+    require(
+        "if let profileImageURL" in picture,
+        "profile image JSON must guard the profile image URL",
+    )
+
+
 def main():
     checks = [
         check_project_manifest_references,
         check_app_plist_contract,
         check_test_plist_contract,
         check_resources_parse,
+        check_twitter_json_guards,
     ]
     try:
         for check in checks:

@@ -39,40 +39,31 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
                     // setup json to contain the data
                     let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError)
 
-                    // find the key "geo" from the Tweets
-                    let last_tweet = json![0]["geo"]
+                    // see if the json_object is an array
+                    if let json_object = json as? JSONArray {
 
-                    // if the geo is not nil e.g. not empty
-                    if last_tweet != nil {
+                        // for each item in the json_object
+                        for item in json_object{
 
-                        // see if the json_object is an array
-                        if let json_object = json as? JSONArray {
+                            // check whether it is a dictionary
+                            if let json_dict = item as? JSONDictionary {
 
-                            // for each item in the json_object
-                            for item in json_object{
+                                // get the value from {"geo": {"coordinates".....
+                                if let geo = json_dict["geo"] as? JSONDictionary{
 
-                                // check whether it is a dictionary
-                                if let json_dict = item as? JSONDictionary {
+                                    // handle the coordinates
+                                    if let coordinates = geo["coordinates"] as? NSArray{
+                                        if coordinates.count >= 2 {
+                                            var lat: AnyObject = coordinates[1]
+                                            var lng: AnyObject = coordinates[0]
 
-                                    // if geo is not null
-                                    if json_dict["geo"] != nil {
+                                            let r = [Double(lat.doubleValue), Double(lng.doubleValue)]
 
-                                        // get the value from {"geo": {"coordinates".....
-                                        if let geo = json_dict["geo"] as? JSONDictionary{
+                                            // send the coordinate data to completion
+                                            completion(result: r)
 
-                                            // handle the coordinates
-                                            if let coordinates = geo["coordinates"] as? NSArray{
-                                                var lat: AnyObject = geo["coordinates"]![1]
-                                                var lng: AnyObject = geo["coordinates"]![0]
-
-                                                let r = [Double(lat.doubleValue), Double(lng.doubleValue)]
-
-                                                // send the coordinate data to completion
-                                                completion(result: r)
-
-                                                // don't continue to iterate one geo is fine for us
-                                                break
-                                            }
+                                            // don't continue to iterate one geo is fine for us
+                                            break
                                         }
                                     }
                                 }
@@ -93,7 +84,6 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
 
 
         }
-
 
 
 
