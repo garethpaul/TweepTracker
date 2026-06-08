@@ -18,6 +18,7 @@ Priority:
 - Keep Fabric/TwitterKit setup documented as legacy
 - Avoid committing API keys, tokens, or crash-reporting secrets
 - Treat mapped user data as sensitive
+- Keep Xcode project manifests checked in and parseable
 
 Next priorities:
 

@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+"""Static verification for the legacy TweepTracker Xcode project."""
+
+from pathlib import Path
+import json
+import plistlib
+import re
+import sys
+import xml.etree.ElementTree as ET
+
+
+ROOT = Path(__file__).resolve().parents[1]
+PROJECT_FILE = ROOT / "location_tracker.xcodeproj/project.pbxproj"
+
+
+def fail(message):
+    print(f"check_ios_project.py: {message}", file=sys.stderr)
+    return 1
+
+
+def read_text(relative_path):
+    return (ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def require(condition, message):
+    if not condition:
+        raise AssertionError(message)
+
+
+def load_plist(relative_path):
+    with (ROOT / relative_path).open("rb") as plist_file:
+        return plistlib.load(plist_file)
+
+
+def check_project_manifest_references():
+    project = PROJECT_FILE.read_text(encoding="utf-8")
+    plist_paths = sorted(set(re.findall(r"INFOPLIST_FILE = ([^;]+);", project)))
+    require(plist_paths, "project must reference Info.plist files")
+
+    for plist_path in plist_paths:
+        path = ROOT / plist_path.strip('"')
+        require(path.exists(), f"{plist_path} is referenced by Xcode but not checked in")
+        load_plist(plist_path.strip('"'))
+
+    require("Storyboard.storyboard in Resources" in project, "main storyboard must remain bundled")
+    require("location_trackerTests.swift in Sources" in project, "unit test source must remain compiled")
+
+
+def check_app_plist_contract():
+    info = load_plist("location_tracker/Info.plist")
+    require(info["CFBundlePackageType"] == "APPL", "app bundle package type must be APPL")
+    require(info["CFBundleExecutable"] == "$(EXECUTABLE_NAME)", "app executable must use Xcode substitution")
+    require(info["UIMainStoryboardFile"] == "Storyboard", "app must launch the bundled Storyboard.storyboard")
+    require(info["UILaunchStoryboardName"] == "LaunchScreen", "app must keep the launch screen reference")
+    require("_" not in info["CFBundleIdentifier"], "bundle identifier must not contain underscores")
+
+
+def check_test_plist_contract():
+    info = load_plist("location_trackerTests/Info.plist")
+    require(info["CFBundlePackageType"] == "BNDL", "test bundle package type must be BNDL")
+    require(info["CFBundleExecutable"] == "$(EXECUTABLE_NAME)", "test executable must use Xcode substitution")
+    require(info["CFBundleIdentifier"].endswith(".tests"), "test bundle identifier must be test-specific")
+
+
+def check_resources_parse():
+    for relative_path in [
+        "location_tracker/Storyboard.storyboard",
+        "location_tracker/Base.lproj/LaunchScreen.xib",
+    ]:
+        ET.parse(ROOT / relative_path)
+
+    for path in (ROOT / "location_tracker/Images.xcassets").rglob("Contents.json"):
+        json.loads(path.read_text(encoding="utf-8"))
+
+
+def main():
+    checks = [
+        check_project_manifest_references,
+        check_app_plist_contract,
+        check_test_plist_contract,
+        check_resources_parse,
+    ]
+    try:
+        for check in checks:
+            check()
+    except (AssertionError, ET.ParseError, json.JSONDecodeError, plistlib.InvalidFileException) as exc:
+        return fail(str(exc))
+
+    print(f"TweepTracker static project checks passed ({len(checks)} checks).")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
