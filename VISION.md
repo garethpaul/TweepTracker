@@ -39,7 +39,6 @@ Canonical security policy and reporting:
 
 - [`SECURITY.md`](SECURITY.md)
 
-
 Mapping people from social data can expose location and identity information.
 The app should use explicit demo data, avoid storing user locations, and make
 API and crash-reporting behavior visible.
