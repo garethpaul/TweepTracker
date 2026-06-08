@@ -1,23 +1,82 @@
 # TweepTracker
 
-<!-- README-OVERVIEW-IMAGE -->
-![Project overview](docs/readme-overview.svg)
+## Overview
 
-TweepTracker
-============
+`garethpaul/TweepTracker` is an Apple platform application or Swift sample. iOS app that tracks Tweeps around the world.
 
-iOS App that tracks members of the team based on the geo tags of their latest tweets. 
+This README is based on the checked-in source, manifests, scripts, and repository metadata on the `master` branch. The project language mix found during review was: C/C++ headers (22), Swift (12).
 
-You will need
+## Repository Contents
 
-Fabric.app via Fabric.io to setup this project.
+- `README.md` - project overview and local usage notes
+- `Crashlytics.framework` - source or example code
+- `Fabric.framework` - source or example code
+- `location_tracker` - source or example code
+- `location_tracker.xcodeproj` - Xcode project file
+- `location_trackerTests` - source or example code
+- `SECURITY.md` - security reporting and disclosure guidance
+- `TwitterKit.framework` - source or example code
+- `VISION.md` - project direction and maintenance guardrails
 
-Please use the app to walk through adding the TwitterKit and Crashlytics.
+Additional scan context:
 
-Reach out to support@fabric.io with questions.. 
+- Source directories: Crashlytics.framework, Fabric.framework, TwitterKit.framework, location_tracker, location_trackerTests
+- Dependency and build manifests: none detected
+- Entry points or build surfaces: location_tracker.xcodeproj
+- Test-looking files: location_trackerTests/location_trackerTests.swift
 
-Getting started
-===============
+## Getting Started
 
-Install Fabric via Fabric.io/downloads
-Locate your project and install the Twitter Kit
+### Prerequisites
+
+- Git
+- macOS with Xcode for building Apple platform projects
+
+### Setup
+
+```bash
+git clone https://github.com/garethpaul/TweepTracker.git
+cd TweepTracker
+```
+
+The setup commands above are derived from repository files. Legacy mobile, Python, or JavaScript samples may require older SDKs or package versions than a modern workstation uses by default.
+
+## Running or Using the Project
+
+- Open `location_tracker.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
+
+## Testing and Verification
+
+- Xcode's test action or `xcodebuild test` with the appropriate scheme and destination
+
+When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
+
+## Configuration and Secrets
+
+- Detected references to Twitter. Keep API keys, OAuth credentials, tokens, and account-specific values in local configuration only.
+
+## Security and Privacy Notes
+
+- Review changes touching authentication or token handling; examples from the scan include Crashlytics.framework/Versions/A/Headers/Crashlytics.h, TwitterKit.framework/Versions/A/Headers/DGTAuthenticateButton.h, TwitterKit.framework/Versions/A/Headers/DGTSession.h, TwitterKit.framework/Versions/A/Headers/Digits.h, and 6 more.
+- Review changes touching external API calls or credential-adjacent configuration; examples from the scan include Crashlytics.framework/Versions/A/Headers/Crashlytics.h, Fabric.framework/Versions/A/Headers/Fabric.h, TwitterKit.framework/Versions/A/Headers/DGTAuthenticateButton.h, TwitterKit.framework/Versions/A/Headers/DGTConstants.h, and 6 more.
+- Review changes touching network requests, sockets, or service endpoints; examples from the scan include TwitterKit.framework/Versions/A/Headers/TWTRAPIClient.h, TwitterKit.framework/Versions/A/Headers/TWTRAPIErrorCode.h, TwitterKit.framework/Versions/A/Headers/TWTROAuthSigning.h, TwitterKit.framework/Versions/A/Headers/TWTRSession.h, and 5 more.
+- Review changes touching mobile permissions or privacy-sensitive device data; examples from the scan include TwitterKit.framework/Versions/A/Headers/TWTRConstants.h, location_tracker/AppDelegate.swift, location_tracker/ViewController.swift.
+- Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include TwitterKit.framework/Versions/A/Headers/TWTRAPIClient.h, TwitterKit.framework/Versions/A/Headers/TWTRComposer.h, TwitterKit.framework/Versions/A/Headers/TWTROAuthSigning.h, TwitterKit.framework/Versions/A/Headers/TWTRTweet.h, and 6 more.
+- Review changes touching database, model, or persistence code; examples from the scan include TwitterKit.framework/Versions/A/Headers/TWTRTweetTableViewCell.h, TwitterKit.framework/Versions/A/Headers/TWTRTweetViewDelegate.h.
+
+## Maintenance Notes
+
+- This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
+- See `SECURITY.md` for vulnerability reporting and safe research guidance.
+- See `VISION.md` for project direction and contribution guardrails.
+
+## Contributing
+
+Keep changes small and tied to the project that is already present in this repository. For code changes, document the toolchain used, avoid committing generated dependency directories or local configuration, and update this README when setup or verification steps change.
+
+## Existing Project Notes
+
+Prior README summary:
+
+> TweepTracker <!-- README-OVERVIEW-IMAGE --> TweepTracker ============ iOS App that tracks members of the team based on the geo tags of their latest tweets. You will need Fabric.app via Fabric.io to setup this project. Please use the app to walk through adding the TwitterKit and Crashlytics.
+
