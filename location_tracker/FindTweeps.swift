@@ -47,16 +47,18 @@ func FindTweeps(completion: (result: [String]) -> Void) {
                 var userArray = Array<String>()
 
                 // get the output from the json {"users": [...]}
-                if let users = json!["users"] as? JSONArray {
+                if let jsonObject = json as? JSONDictionary {
+                    if let users = jsonObject["users"] as? JSONArray {
 
-                    // iterate through the list of users
-                    for user in users {
+                        // iterate through the list of users
+                        for user in users {
 
-                        // if there is a json object like the following {"screen_name": "gpj"}
-                        if let screenName = user["screen_name"] as?String {
+                            // if there is a json object like the following {"screen_name": "gpj"}
+                            if let screenName = user["screen_name"] as?String {
 
-                            // Append the user the array
-                            userArray.append(screenName)
+                                // Append the user the array
+                                userArray.append(screenName)
+                            }
                         }
                     }
                 }
@@ -82,7 +84,6 @@ func FindTweeps(completion: (result: [String]) -> Void) {
     }
 
 }
-
 
 
 

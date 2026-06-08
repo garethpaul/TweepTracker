@@ -54,6 +54,7 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 - `make check` runs plist, storyboard, asset, Xcode project, and Twitter JSON
   parsing contract checks.
+- Static checks also require completed canonical plans under `docs/plans`.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -76,6 +77,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
+- See `docs/plans/2026-06-08-tweeptracker-baseline.md` for the canonical
+  static project and Twitter JSON parsing baseline.
 
 ## Contributing
 

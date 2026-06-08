@@ -73,10 +73,32 @@ def check_resources_parse():
         json.loads(path.read_text(encoding="utf-8"))
 
 
+def check_docs_plans():
+    plan_dir = ROOT / "docs" / "plans"
+    require(plan_dir.is_dir(), "docs/plans must exist")
+
+    plans = sorted(plan_dir.glob("*.md"))
+    require(plans, "docs/plans must contain completed maintenance plans")
+
+    for plan in plans:
+        text = plan.read_text(encoding="utf-8")
+        require("status: completed" in text.lower(), f"{plan.name} must be completed")
+        require("make check" in text, f"{plan.name} must document make check verification")
+
+
 def check_twitter_json_guards():
+    find_tweeps = read_text("location_tracker/FindTweeps.swift")
     location = read_text("location_tracker/TweepLocation.swift")
     picture = read_text("location_tracker/TweepPicture.swift")
 
+    require(
+        'json!["users"]' not in find_tweeps,
+        "list-member JSON must not force-unwrap the response object",
+    )
+    require(
+        "json as? JSONDictionary" in find_tweeps,
+        "list-member JSON must guard the response dictionary",
+    )
     require('json![0]["geo"]' not in location, "timeline JSON must not force-unwrap the first tweet")
     require(
         'geo["coordinates"]!' not in location,
@@ -102,6 +124,7 @@ def main():
         check_app_plist_contract,
         check_test_plist_contract,
         check_resources_parse,
+        check_docs_plans,
         check_twitter_json_guards,
     ]
     try:
