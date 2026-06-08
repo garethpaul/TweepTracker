@@ -81,4 +81,4 @@ Keep changes small and tied to the project that is already present in this repos
 
 Prior README summary:
 
-> TweepTracker <!-- README-OVERVIEW-IMAGE --> TweepTracker ============ iOS App that tracks members of the team based on the geo tags of their latest tweets. You will need Fabric.app via Fabric.io to setup this project. Please use the app to walk through adding the TwitterKit and Crashlytics.
+> TweepTracker TweepTracker ============ iOS App that tracks members of the team based on the geo tags of their latest tweets. You will need Fabric.app via Fabric.io to setup this project. Please use the app to walk through adding the TwitterKit and Crashlytics.
