@@ -76,9 +76,3 @@ When the required SDK or runtime is unavailable, use static checks and source re
 ## Contributing
 
 Keep changes small and tied to the project that is already present in this repository. For code changes, document the toolchain used, avoid committing generated dependency directories or local configuration, and update this README when setup or verification steps change.
-
-## Existing Project Notes
-
-Prior README summary:
-
-> TweepTracker TweepTracker ============ iOS App that tracks members of the team based on the geo tags of their latest tweets. You will need Fabric.app via Fabric.io to setup this project. Please use the app to walk through adding the TwitterKit and Crashlytics.
