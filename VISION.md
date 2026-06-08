@@ -19,12 +19,13 @@ Priority:
 - Avoid committing API keys, tokens, or crash-reporting secrets
 - Treat mapped user data as sensitive
 - Keep Xcode project manifests checked in and parseable
+- Avoid force-unwrapping remote Twitter API fields
 
 Next priorities:
 
 - Add setup notes for legacy SDK requirements and current API limitations
-- Replace hardcoded supplemental handles with configurable demo data
 - Add privacy notes for geolocation and profile images
+- Replace hardcoded supplemental handles with configurable demo data
 - Modernize Swift only in a dedicated pass
 
 Contribution rules:
