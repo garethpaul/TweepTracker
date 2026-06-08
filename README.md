@@ -47,11 +47,11 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 ## Running or Using the Project
 
 - Open `location_tracker.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
-- Run `make verify` for static project checks. The Xcode test and build steps run only on hosts where `xcodebuild` is installed.
+- Run `make check` for static project checks. The Xcode test and build steps run only on hosts where `xcodebuild` is installed.
 
 ## Testing and Verification
 
-- `make verify`
+- `make check`
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
