@@ -39,7 +39,7 @@ Mapping people from social data can expose location and identity information.
 The app should use explicit demo data, avoid storing user locations, and make
 API and crash-reporting behavior visible.
 
-## What We Will Not Merge For Now
+## What We Will Not Merge (For Now)
 
 - Checked-in Twitter/Fabric credentials
 - Hidden location tracking
