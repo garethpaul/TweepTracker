@@ -52,8 +52,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 ## Testing and Verification
 
-- `make check` runs plist, storyboard, asset, Xcode project, and Twitter JSON
-  parsing contract checks.
+- `make check` runs plist, storyboard, asset, Xcode project, Twitter JSON
+  parsing, and profile-image loading contract checks.
 - Static checks also require completed canonical plans under `docs/plans`.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
@@ -79,6 +79,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-08-tweeptracker-baseline.md` for the canonical
   static project and Twitter JSON parsing baseline.
+- See `docs/plans/2026-06-08-profile-image-guards.md` for profile image URL
+  and decode guard coverage.
 
 ## Contributing
 

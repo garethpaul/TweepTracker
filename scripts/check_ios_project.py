@@ -90,6 +90,8 @@ def check_twitter_json_guards():
     find_tweeps = read_text("location_tracker/FindTweeps.swift")
     location = read_text("location_tracker/TweepLocation.swift")
     picture = read_text("location_tracker/TweepPicture.swift")
+    view_controller = read_text("location_tracker/ViewController.swift")
+    url_helper = read_text("location_tracker/URL.swift")
 
     require(
         'json!["users"]' not in find_tweeps,
@@ -115,6 +117,30 @@ def check_twitter_json_guards():
     require(
         "if let profileImageURL" in picture,
         "profile image JSON must guard the profile image URL",
+    )
+    require(
+        "NSURL(string: url_string)!" not in view_controller,
+        "profile image annotation URL must not be force-unwrapped",
+    )
+    require(
+        "if let imageURL = NSURL(string: url_string)" in view_controller,
+        "profile image annotation URL must be optional-guarded",
+    )
+    require(
+        "if let newImg = image" in view_controller,
+        "profile image annotation must guard decoded images",
+    )
+    require(
+        "func downloadImage(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void))" in url_helper,
+        "downloadImage must expose optional decoded images",
+    )
+    require(
+        "UIImage(data: data)!" not in url_helper,
+        "downloadImage must not force-unwrap decoded image data",
+    )
+    require(
+        "handler(image: nil, error)" in url_helper,
+        "downloadImage must report failed image downloads without crashing",
     )
 
 

@@ -2,6 +2,8 @@
 
 ## 2026-06-08
 
+- Guarded profile image URL creation and image decoding before assigning map
+  annotation images.
 - Guarded Twitter list-member JSON parsing so missing or malformed `users`
   payloads do not crash the sample.
 - Added canonical `docs/plans` coverage to the static project check.

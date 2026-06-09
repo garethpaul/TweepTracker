@@ -20,6 +20,7 @@ Priority:
 - Treat mapped user data as sensitive
 - Keep Xcode project manifests checked in and parseable
 - Avoid force-unwrapping remote Twitter API fields
+- Avoid force-unwrapping remote profile image URLs or decoded image data
 
 Next priorities:
 

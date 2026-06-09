@@ -126,13 +126,16 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
             let url = URL()
             let url_string = tweep.imageURL
-            url.downloadImage(NSURL(string: url_string)!, {image, error in
-                let newImg = image
-                let circle = CircleImage(RBResizeImage(newImg, CGSize(width: 50, height: 50)))
-                pinView!.image = circle
+            if let imageURL = NSURL(string: url_string) {
+                url.downloadImage(imageURL, {image, error in
+                    if let newImg = image {
+                        let circle = CircleImage(RBResizeImage(newImg, CGSize(width: 50, height: 50)))
+                        pinView!.image = circle
+                    }
+                })
+            }
 
 
-            })
             pinView?.sizeThatFits(CGSize(width:3, height:3))
 
             pinView!.canShowCallout = true
@@ -233,4 +236,3 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
 
 }
-
