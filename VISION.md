@@ -22,6 +22,7 @@ Priority:
 - Avoid force-unwrapping remote Twitter API fields
 - Avoid force-unwrapping remote profile image URLs or decoded image data
 - Preserve normalized latitude/longitude order before rendering map annotations
+- Require numeric Twitter timeline coordinates before rendering map annotations
 - Require successful Twitter login sessions before map navigation
 - Avoid blocking map setup while waiting to reveal loaded annotations
 - Complete Twitter list lookups even when request setup or transport fails
@@ -62,6 +63,7 @@ API and crash-reporting behavior visible.
 - Hidden location tracking
 - Captured user datasets
 - Hardcoded coordinate upload endpoints
+- Map annotations from non-numeric remote coordinate payloads
 - Public tracking behavior without consent and documentation
 
 This list is a roadmap guardrail, not a permanent rule.

@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Required Twitter timeline latitude and longitude values to be numeric before
+  returning map annotation coordinates.
 - Completed profile-image lookup failures and missing image URLs with an empty
   result so map annotation flow can continue.
 - Extended static project checks to require profile-image lookup completion

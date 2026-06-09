@@ -55,13 +55,15 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
                                     // handle the coordinates
                                     if let coordinates = geo["coordinates"] as? NSArray{
                                         if coordinates.count >= 2 {
-                                            var lat: AnyObject = coordinates[1]
-                                            var lng: AnyObject = coordinates[0]
+                                            if let lat = coordinates[1] as? NSNumber {
+                                                if let lng = coordinates[0] as? NSNumber {
 
-                                            coordinateResult = [Double(lat.doubleValue), Double(lng.doubleValue)]
+                                                    coordinateResult = [lat.doubleValue, lng.doubleValue]
 
-                                            // don't continue to iterate one geo is fine for us
-                                            break
+                                                    // don't continue to iterate one geo is fine for us
+                                                    break
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -87,5 +89,4 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
 
 
         }
-
 

@@ -58,6 +58,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   contract checks. Static checks also require Twitter list-member request
   failures, timeline coordinate lookup failures, and profile-image lookup
   failures to complete with empty results so the map setup path can finish.
+  Timeline coordinate checks require latitude and longitude JSON values to be
+  numeric before map annotations are created.
 - Static checks also require completed canonical plans under `docs/plans`.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
@@ -99,6 +101,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   coordinate lookup completion guard.
 - See `docs/plans/2026-06-09-profile-image-completion.md` for profile-image
   lookup completion coverage.
+- See `docs/plans/2026-06-09-coordinate-number-validation.md` for numeric
+  timeline coordinate validation.
 
 ## Contributing
 
