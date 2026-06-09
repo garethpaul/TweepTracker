@@ -2,6 +2,10 @@
 
 ## 2026-06-09
 
+- Completed profile-image lookup failures and missing image URLs with an empty
+  result so map annotation flow can continue.
+- Extended static project checks to require profile-image lookup completion
+  guards.
 - Completed Twitter timeline coordinate lookup failure and no-coordinate paths
   with an empty result.
 - Extended static project checks to require timeline coordinate completion

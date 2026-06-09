@@ -27,6 +27,8 @@ Priority:
 - Complete Twitter list lookups even when request setup or transport fails
 - Complete Twitter timeline coordinate lookups even when responses lack usable
   coordinates
+- Complete Twitter profile-image lookups even when no usable image URL is
+  returned
 - Avoid hardcoded external upload paths for user coordinates
 
 Next priorities:

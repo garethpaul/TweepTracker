@@ -34,27 +34,31 @@ func TweepPicture(handle: String, completion: (result: String) -> Void) {
             (response, data, connectionError) -> Void in
             if (connectionError == nil) {
                 var jsonError : NSError?
+                var profileImageURL = ""
 
                 // Setup json to contain the JSON object returned by the API
                 let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError)
 
                 // find the profile image from the json object e.g. {"profile_image_url": ...}
                 if let jsonObject = json as? JSONDictionary {
-                    if let profileImageURL = jsonObject["profile_image_url"] as? String {
-
-                        // Complete and return the profile_image_url back.
-                        completion(result: profileImageURL)
+                    if let foundProfileImageURL = jsonObject["profile_image_url"] as? String {
+                        profileImageURL = foundProfileImageURL
                     }
                 }
+
+                // Complete and return the profile_image_url back.
+                completion(result: profileImageURL)
             }
 
             else {
                 println("Error: \(connectionError)")
+                completion(result: "")
             }
         }
     }
     else {
         println("Error: \(clientError)")
+        completion(result: "")
     }
 
 }

@@ -80,6 +80,14 @@ def check_docs_plans():
         (plan_dir / "2026-06-09-timeline-location-completion.md").exists(),
         "docs/plans/2026-06-09-timeline-location-completion.md is missing",
     )
+    require(
+        (plan_dir / "2026-06-09-profile-image-completion.md").exists(),
+        "docs/plans/2026-06-09-profile-image-completion.md is missing",
+    )
+    require(
+        (plan_dir / "2026-06-09-profile-image-completion.md").exists(),
+        "docs/plans/2026-06-09-profile-image-completion.md is missing",
+    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -157,8 +165,20 @@ def check_twitter_json_guards():
         "profile image JSON must not force-unwrap the profile image URL",
     )
     require(
-        "if let profileImageURL" in picture,
+        "if let foundProfileImageURL" in picture,
         "profile image JSON must guard the profile image URL",
+    )
+    require(
+        'var profileImageURL = ""' in picture,
+        "profile image lookup must keep an empty fallback result",
+    )
+    require(
+        "completion(result: profileImageURL)" in picture,
+        "profile image lookup must complete after parsing succeeds or finds no image URL",
+    )
+    require(
+        picture.count('completion(result: "")') >= 2,
+        "profile image request error paths must complete with an empty result",
     )
     require(
         "NSURL(string: url_string)!" not in view_controller,
