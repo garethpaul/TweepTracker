@@ -13,8 +13,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    let url = URL()
-
     func application(application: UIApplication!, didFinishLaunchingWithOptions launchOptions: NSDictionary!) -> Bool {
         //
         UIApplication.sharedApplication().statusBarStyle = UIStatusBarStyle.LightContent;
@@ -60,8 +58,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //println(newLocation.coordinate.longitude)
         //let latitude  = String(format: "%f", newLocation.coordinate.latitude)
         //let longitude = String(format: "%f", newLocation.coordinate.latitude)
-        //url.geo(latitude, lng: longitude)
     }
 
 }
-

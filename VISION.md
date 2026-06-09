@@ -22,6 +22,7 @@ Priority:
 - Avoid force-unwrapping remote Twitter API fields
 - Avoid force-unwrapping remote profile image URLs or decoded image data
 - Preserve normalized latitude/longitude order before rendering map annotations
+- Avoid hardcoded external upload paths for user coordinates
 
 Next priorities:
 
@@ -53,6 +54,7 @@ API and crash-reporting behavior visible.
 - Checked-in Twitter/Fabric credentials
 - Hidden location tracking
 - Captured user datasets
+- Hardcoded coordinate upload endpoints
 - Public tracking behavior without consent and documentation
 
 This list is a roadmap guardrail, not a permanent rule.

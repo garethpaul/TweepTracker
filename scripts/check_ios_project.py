@@ -92,6 +92,7 @@ def check_twitter_json_guards():
     picture = read_text("location_tracker/TweepPicture.swift")
     view_controller = read_text("location_tracker/ViewController.swift")
     url_helper = read_text("location_tracker/URL.swift")
+    app_delegate = read_text("location_tracker/AppDelegate.swift")
 
     require(
         'json!["users"]' not in find_tweeps,
@@ -157,6 +158,18 @@ def check_twitter_json_guards():
     require(
         "handler(image: nil, error)" in url_helper,
         "downloadImage must report failed image downloads without crashing",
+    )
+    require(
+        "garethpaul-app.appspot.com" not in url_helper + app_delegate,
+        "hardcoded external coordinate upload endpoint must not be present",
+    )
+    require(
+        "func geo(" not in url_helper and ".geo(" not in app_delegate,
+        "location coordinates must not be silently uploaded through URL.geo",
+    )
+    require(
+        "func post(params" not in url_helper,
+        "unused coordinate POST helper must not be kept in URL.swift",
     )
 
 

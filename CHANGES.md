@@ -2,6 +2,9 @@
 
 ## 2026-06-09
 
+- Removed the unused hardcoded coordinate upload helper from `URL.swift`.
+- Extended static project checks to prevent silent external coordinate upload
+  paths from returning.
 - Guarded map annotation coordinate results before indexing and preserved the
   normalized latitude/longitude order from Twitter timeline parsing.
 
