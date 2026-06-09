@@ -84,10 +84,6 @@ def check_docs_plans():
         (plan_dir / "2026-06-09-profile-image-completion.md").exists(),
         "docs/plans/2026-06-09-profile-image-completion.md is missing",
     )
-    require(
-        (plan_dir / "2026-06-09-profile-image-completion.md").exists(),
-        "docs/plans/2026-06-09-profile-image-completion.md is missing",
-    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
