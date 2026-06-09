@@ -149,6 +149,18 @@ def check_twitter_json_guards():
         "profile image annotation must guard decoded images",
     )
     require(
+        "sleep(5)" not in view_controller,
+        "map setup must not block the async completion path with sleep",
+    )
+    require(
+        "let mapDelay = 5 * Double(NSEC_PER_SEC)" in view_controller,
+        "map setup must keep the delayed map reveal explicit",
+    )
+    require(
+        "dispatch_after(mapTime, dispatch_get_main_queue())" in view_controller,
+        "map setup must reveal the map asynchronously on the main queue",
+    )
+    require(
         "func downloadImage(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void))" in url_helper,
         "downloadImage must expose optional decoded images",
     )

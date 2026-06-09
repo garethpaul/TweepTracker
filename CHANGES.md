@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Replaced the blocking map reveal sleep with asynchronous dispatch timing.
+- Extended static project checks to prevent blocking map setup from returning.
 - Guarded Twitter login completion so failed or missing sessions do not segue
   into the map view.
 - Extended static project checks to require the login failure guard before

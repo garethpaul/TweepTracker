@@ -169,19 +169,20 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
 
             self.mapView.setRegion(region, animated: true)
-            // give 3 seconds to load
-            sleep(5)
-            self.spinner.stopAnimating()
-            self.mapView.hidden = false;
-            self.spinner.hidden = true;
-
-
-            let delay = 60 * Double(NSEC_PER_SEC)
-            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
             self.refresh.hidden = true
-            dispatch_after(time, dispatch_get_main_queue()) {
-                //call the method which have the steps after delay.
-                self.displayRefresh()
+            let mapDelay = 5 * Double(NSEC_PER_SEC)
+            let mapTime = dispatch_time(DISPATCH_TIME_NOW, Int64(mapDelay))
+            dispatch_after(mapTime, dispatch_get_main_queue()) {
+                self.spinner.stopAnimating()
+                self.mapView.hidden = false;
+                self.spinner.hidden = true;
+
+                let refreshDelay = 60 * Double(NSEC_PER_SEC)
+                let refreshTime = dispatch_time(DISPATCH_TIME_NOW, Int64(refreshDelay))
+                dispatch_after(refreshTime, dispatch_get_main_queue()) {
+                    //call the method which have the steps after delay.
+                    self.displayRefresh()
+                }
             }
 
 
