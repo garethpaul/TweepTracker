@@ -21,6 +21,7 @@ Priority:
 - Keep Xcode project manifests checked in and parseable
 - Avoid force-unwrapping remote Twitter API fields
 - Avoid force-unwrapping remote profile image URLs or decoded image data
+- Preserve normalized latitude/longitude order before rendering map annotations
 
 Next priorities:
 
@@ -35,6 +36,7 @@ Contribution rules:
 - Do not commit API keys, tokens, or captured user location data.
 - Keep demo users configurable and clearly documented.
 - Include simulator/device notes for map behavior changes.
+- Preserve map coordinate guards for malformed Twitter timeline results.
 
 ## Security And Responsible Use
 

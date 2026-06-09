@@ -209,9 +209,13 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
     func locateTweep(handle: String){
         TweepLocation(handle){ (result: [Double]) in
+            if result.count < 2 {
+                return
+            }
+
             let location2 = CLLocationCoordinate2D(
-                latitude: result[1],
-                longitude:result[0]
+                latitude: result[0],
+                longitude: result[1]
             )
 
             // we need pictures then we are good

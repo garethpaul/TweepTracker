@@ -111,6 +111,22 @@ def check_twitter_json_guards():
         "coordinate JSON must verify latitude and longitude are present",
     )
     require(
+        "if result.count < 2" in view_controller,
+        "map annotations must guard malformed coordinate results before indexing",
+    )
+    require(
+        "latitude: result[0]" in view_controller,
+        "map annotations must use normalized latitude from TweepLocation result[0]",
+    )
+    require(
+        "longitude: result[1]" in view_controller,
+        "map annotations must use normalized longitude from TweepLocation result[1]",
+    )
+    require(
+        "latitude: result[1]" not in view_controller and "longitude:result[0]" not in view_controller,
+        "map annotations must not swap normalized latitude and longitude values",
+    )
+    require(
         "profile_image_url!" not in picture,
         "profile image JSON must not force-unwrap the profile image URL",
     )

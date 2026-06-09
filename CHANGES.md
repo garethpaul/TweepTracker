@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-09
+
+- Guarded map annotation coordinate results before indexing and preserved the
+  normalized latitude/longitude order from Twitter timeline parsing.
+
 ## 2026-06-08
 
 - Guarded profile image URL creation and image decoding before assigning map
