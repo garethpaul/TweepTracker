@@ -22,6 +22,7 @@ Priority:
 - Avoid force-unwrapping remote Twitter API fields
 - Avoid force-unwrapping remote profile image URLs or decoded image data
 - Preserve normalized latitude/longitude order before rendering map annotations
+- Require successful Twitter login sessions before map navigation
 - Avoid hardcoded external upload paths for user coordinates
 
 Next priorities:

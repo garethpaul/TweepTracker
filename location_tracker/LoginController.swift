@@ -29,6 +29,10 @@ class LoginController: UIViewController {
         let logInButton = TWTRLogInButton(logInCompletion: {
             (session: TWTRSession!, error: NSError!) in
             // play with Twitter session
+            if session == nil || error != nil {
+                println("Error: \(error)")
+                return
+            }
 
             self.performSegueWithIdentifier("ViewController", sender: self)
 
@@ -37,4 +41,3 @@ class LoginController: UIViewController {
         self.view.addSubview(logInButton)
     }
 }
-

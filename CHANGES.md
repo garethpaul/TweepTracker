@@ -2,6 +2,10 @@
 
 ## 2026-06-09
 
+- Guarded Twitter login completion so failed or missing sessions do not segue
+  into the map view.
+- Extended static project checks to require the login failure guard before
+  navigation.
 - Removed the unused hardcoded coordinate upload helper from `URL.swift`.
 - Extended static project checks to prevent silent external coordinate upload
   paths from returning.

@@ -93,6 +93,7 @@ def check_twitter_json_guards():
     view_controller = read_text("location_tracker/ViewController.swift")
     url_helper = read_text("location_tracker/URL.swift")
     app_delegate = read_text("location_tracker/AppDelegate.swift")
+    login_controller = read_text("location_tracker/LoginController.swift")
 
     require(
         'json!["users"]' not in find_tweeps,
@@ -170,6 +171,15 @@ def check_twitter_json_guards():
     require(
         "func post(params" not in url_helper,
         "unused coordinate POST helper must not be kept in URL.swift",
+    )
+    require(
+        "if session == nil || error != nil" in login_controller,
+        "Twitter login must not segue when the session is missing or an error is present",
+    )
+    require(
+        login_controller.index("if session == nil || error != nil")
+        < login_controller.index('performSegueWithIdentifier("ViewController"'),
+        "Twitter login failure guard must run before the segue",
     )
 
 

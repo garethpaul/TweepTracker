@@ -53,8 +53,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 ## Testing and Verification
 
 - `make check` runs plist, storyboard, asset, Xcode project, Twitter JSON
-  parsing, profile-image loading, map coordinate order, and no external
-  coordinate upload contract checks.
+  parsing, profile-image loading, map coordinate order, Twitter login
+  navigation, and no external coordinate upload contract checks.
 - Static checks also require completed canonical plans under `docs/plans`.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
@@ -86,6 +86,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   coordinate ordering and map annotation coverage.
 - See `docs/plans/2026-06-09-remove-coordinate-upload-helper.md` for the
   no external coordinate upload guard.
+- See `docs/plans/2026-06-09-login-session-guard.md` for the Twitter login
+  navigation guard.
 
 ## Contributing
 
