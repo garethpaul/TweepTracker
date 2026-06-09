@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Completed Twitter list-member request error paths with an empty result so map
+  setup can continue after request failures.
 - Replaced the blocking map reveal sleep with asynchronous dispatch timing.
 - Extended static project checks to prevent blocking map setup from returning.
 - Guarded Twitter login completion so failed or missing sessions do not segue

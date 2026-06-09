@@ -55,7 +55,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - `make check` runs plist, storyboard, asset, Xcode project, Twitter JSON
   parsing, profile-image loading, map coordinate order, Twitter login
   navigation, non-blocking map reveal timing, and no external coordinate upload
-  contract checks.
+  contract checks. Static checks also require Twitter list-member request
+  failures to complete with an empty result so the map setup path can finish.
 - Static checks also require completed canonical plans under `docs/plans`.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
@@ -91,6 +92,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   navigation guard.
 - See `docs/plans/2026-06-09-nonblocking-map-reveal.md` for the map reveal
   timing guard.
+- See `docs/plans/2026-06-09-find-tweeps-error-completion.md` for the
+  list-member request failure completion guard.
 
 ## Contributing
 

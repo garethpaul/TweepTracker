@@ -103,6 +103,10 @@ def check_twitter_json_guards():
         "json as? JSONDictionary" in find_tweeps,
         "list-member JSON must guard the response dictionary",
     )
+    require(
+        find_tweeps.count("completion(result: [])") >= 2,
+        "list-member request error paths must complete with an empty result",
+    )
     require('json![0]["geo"]' not in location, "timeline JSON must not force-unwrap the first tweet")
     require(
         'geo["coordinates"]!' not in location,

@@ -76,15 +76,16 @@ func FindTweeps(completion: (result: [String]) -> Void) {
 
             else {
                 println("Error: \(connectionError)")
+                completion(result: [])
             }
         }
     }
     else {
         println("Error: \(clientError)")
+        completion(result: [])
     }
 
 }
-
 
 
 
