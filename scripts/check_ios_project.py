@@ -76,6 +76,10 @@ def check_resources_parse():
 def check_docs_plans():
     plan_dir = ROOT / "docs" / "plans"
     require(plan_dir.is_dir(), "docs/plans must exist")
+    require(
+        (plan_dir / "2026-06-09-timeline-location-completion.md").exists(),
+        "docs/plans/2026-06-09-timeline-location-completion.md is missing",
+    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -115,6 +119,22 @@ def check_twitter_json_guards():
     require(
         "coordinates.count >= 2" in location,
         "coordinate JSON must verify latitude and longitude are present",
+    )
+    require(
+        "var coordinateResult = Array<Double>()" in location,
+        "timeline coordinate lookup must keep an empty fallback result",
+    )
+    require(
+        "coordinateResult = [Double(lat.doubleValue), Double(lng.doubleValue)]" in location,
+        "timeline coordinate lookup must store normalized coordinates before completion",
+    )
+    require(
+        "completion(result: coordinateResult)" in location,
+        "timeline coordinate lookup must complete after parsing succeeds or finds no coordinates",
+    )
+    require(
+        location.count("completion(result: [])") >= 2,
+        "timeline coordinate request error paths must complete with an empty result",
     )
     require(
         "if result.count < 2" in view_controller,

@@ -2,6 +2,10 @@
 
 ## 2026-06-09
 
+- Completed Twitter timeline coordinate lookup failure and no-coordinate paths
+  with an empty result.
+- Extended static project checks to require timeline coordinate completion
+  guards.
 - Completed Twitter list-member request error paths with an empty result so map
   setup can continue after request failures.
 - Replaced the blocking map reveal sleep with asynchronous dispatch timing.

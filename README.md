@@ -56,7 +56,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   parsing, profile-image loading, map coordinate order, Twitter login
   navigation, non-blocking map reveal timing, and no external coordinate upload
   contract checks. Static checks also require Twitter list-member request
-  failures to complete with an empty result so the map setup path can finish.
+  failures and timeline coordinate lookup failures to complete with empty
+  results so the map setup path can finish.
 - Static checks also require completed canonical plans under `docs/plans`.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
@@ -94,6 +95,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   timing guard.
 - See `docs/plans/2026-06-09-find-tweeps-error-completion.md` for the
   list-member request failure completion guard.
+- See `docs/plans/2026-06-09-timeline-location-completion.md` for the timeline
+  coordinate lookup completion guard.
 
 ## Contributing
 

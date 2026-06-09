@@ -35,6 +35,7 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
                 if (connectionError == nil) {
 
                     var jsonError : NSError?
+                    var coordinateResult = Array<Double>()
 
                     // setup json to contain the data
                     let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError)
@@ -57,10 +58,7 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
                                             var lat: AnyObject = coordinates[1]
                                             var lng: AnyObject = coordinates[0]
 
-                                            let r = [Double(lat.doubleValue), Double(lng.doubleValue)]
-
-                                            // send the coordinate data to completion
-                                            completion(result: r)
+                                            coordinateResult = [Double(lat.doubleValue), Double(lng.doubleValue)]
 
                                             // don't continue to iterate one geo is fine for us
                                             break
@@ -71,19 +69,23 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
                         }
                     }
 
+                    // send the coordinate data to completion
+                    completion(result: coordinateResult)
+
                 }
                 else {
                     println("Error: \(connectionError)")
+                    completion(result: [])
                 }
         }
     }
     else {
         println("Error: \(clientError)")
+        completion(result: [])
     }
 
 
 
         }
-
 
 

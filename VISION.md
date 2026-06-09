@@ -25,6 +25,8 @@ Priority:
 - Require successful Twitter login sessions before map navigation
 - Avoid blocking map setup while waiting to reveal loaded annotations
 - Complete Twitter list lookups even when request setup or transport fails
+- Complete Twitter timeline coordinate lookups even when responses lack usable
+  coordinates
 - Avoid hardcoded external upload paths for user coordinates
 
 Next priorities:
