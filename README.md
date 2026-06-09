@@ -3,6 +3,11 @@
 <!-- README-OVERVIEW-IMAGE -->
 ![Project overview](docs/readme-overview.svg)
 
+## Device Preview
+
+<!-- DEVICE-PREVIEW-IMAGE -->
+![Device preview](docs/device-preview.svg)
+
 ## Overview
 
 `garethpaul/TweepTracker` is an Apple platform application or Swift sample. iOS app that tracks Tweeps around the world.
