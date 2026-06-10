@@ -2,6 +2,8 @@
 
 ## 2026-06-10
 
+- Guarded asynchronous avatar assignment against map annotation reuse and
+  removed the Tweep annotation force-cast.
 - Hardened remote profile-image loading with HTTPS-only URLs, status and MIME
   validation, a five-megabyte limit, a timeout, and background network/decode
   work with main-queue completion.

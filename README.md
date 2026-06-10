@@ -60,6 +60,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   failures to complete with empty results so the map setup path can finish.
   Timeline coordinate checks require latitude and longitude JSON values to be
   numeric before map annotations are created.
+- Reused map annotation views clear stale avatars and only accept an async
+  image when they still represent the requesting Tweep.
 - Static checks also require completed canonical plans under `docs/plans`.
 - GitHub Actions installs Python 3.12 and runs `make check` for pushes, pull
   requests, and manual runs with read-only repository permissions, a
@@ -112,6 +114,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   timeline coordinate validation.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the hosted GitHub Actions
   static contract gate.
+- See `docs/plans/2026-06-10-annotation-image-reuse.md` for asynchronous map
+  annotation image reuse guards.
 
 ## Contributing
 

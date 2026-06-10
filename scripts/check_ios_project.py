@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT_FILE = ROOT / "location_tracker.xcodeproj/project.pbxproj"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 IMAGE_TRANSPORT_PLAN = ROOT / "docs/plans/2026-06-10-profile-image-transport.md"
+ANNOTATION_REUSE_PLAN = ROOT / "docs/plans/2026-06-10-annotation-image-reuse.md"
 
 
 def fail(message):
@@ -104,6 +105,7 @@ def check_docs_plans():
         "docs/plans/2026-06-10-ci-baseline.md is missing",
     )
     require(IMAGE_TRANSPORT_PLAN.exists(), "docs/plans/2026-06-10-profile-image-transport.md is missing")
+    require(ANNOTATION_REUSE_PLAN.exists(), "docs/plans/2026-06-10-annotation-image-reuse.md is missing")
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -261,6 +263,25 @@ def check_twitter_json_guards():
     require(
         "if let newImg = image" in view_controller,
         "profile image annotation must guard decoded images",
+    )
+    for contract in (
+        "pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)",
+        "pinView!.image = nil",
+        "if let tweep = annotation as? TweepAnnotation",
+        "if let currentAnnotation = pinView?.annotation",
+        "if currentAnnotation === annotation",
+    ):
+        require(contract in view_controller, f"annotation image reuse guard is missing: {contract}")
+    require(
+        "let tweep = annotation as TweepAnnotation" not in view_controller,
+        "map annotations must not be force-cast to TweepAnnotation",
+    )
+    require(
+        view_controller.count(
+            "pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)"
+        )
+        == 1,
+        "map annotation views must only be created when dequeue returns nil",
     )
     require(
         "sleep(5)" not in view_controller,

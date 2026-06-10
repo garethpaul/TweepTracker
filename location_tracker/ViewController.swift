@@ -113,26 +113,29 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
             var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
             if pinView == nil {
-
+                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             }
             else {
                 pinView!.annotation = annotation
             }
 
-            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.image = nil
 
-
-            let tweep = annotation as TweepAnnotation
-
-            let url = URL()
-            let url_string = tweep.imageURL
-            if let imageURL = NSURL(string: url_string) {
-                url.downloadImage(imageURL, {image, error in
-                    if let newImg = image {
-                        let circle = CircleImage(RBResizeImage(newImg, CGSize(width: 50, height: 50)))
-                        pinView!.image = circle
-                    }
-                })
+            if let tweep = annotation as? TweepAnnotation {
+                let url = URL()
+                let url_string = tweep.imageURL
+                if let imageURL = NSURL(string: url_string) {
+                    url.downloadImage(imageURL, {image, error in
+                        if let newImg = image {
+                            if let currentAnnotation = pinView?.annotation {
+                                if currentAnnotation === annotation {
+                                    let circle = CircleImage(RBResizeImage(newImg, CGSize(width: 50, height: 50)))
+                                    pinView!.image = circle
+                                }
+                            }
+                        }
+                    })
+                }
             }
 
 
