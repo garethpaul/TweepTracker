@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT_FILE = ROOT / "location_tracker.xcodeproj/project.pbxproj"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
+IMAGE_TRANSPORT_PLAN = ROOT / "docs/plans/2026-06-10-profile-image-transport.md"
 
 
 def fail(message):
@@ -54,6 +55,15 @@ def check_app_plist_contract():
     require(info["UIMainStoryboardFile"] == "Storyboard", "app must launch the bundled Storyboard.storyboard")
     require(info["UILaunchStoryboardName"] == "LaunchScreen", "app must keep the launch screen reference")
     require("_" not in info["CFBundleIdentifier"], "bundle identifier must not contain underscores")
+    require("NSAppTransportSecurity" not in info, "app must not weaken App Transport Security")
+    for credential_key in (
+        "FabricAPIKey",
+        "TwitterKitConsumerKey",
+        "TwitterKitConsumerSecret",
+        "TwitterConsumerKey",
+        "TwitterConsumerSecret",
+    ):
+        require(credential_key not in info, f"app plist must not contain {credential_key}")
 
 
 def check_test_plist_contract():
@@ -93,6 +103,7 @@ def check_docs_plans():
         (plan_dir / "2026-06-10-ci-baseline.md").exists(),
         "docs/plans/2026-06-10-ci-baseline.md is missing",
     )
+    require(IMAGE_TRANSPORT_PLAN.exists(), "docs/plans/2026-06-10-profile-image-transport.md is missing")
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -111,14 +122,30 @@ def check_ci_baseline_docs():
         "pull_request:",
         "workflow_dispatch:",
         "permissions:\n  contents: read",
+        "group: check-${{ github.workflow }}-${{ github.ref }}",
+        "cancel-in-progress: true",
+        "runs-on: ubuntu-24.04",
         "timeout-minutes: 5",
-        "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10",
-        "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405",
+        "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3",
+        "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0",
         'python-version: "3.12"',
         "run: make check",
     ):
         require(contract in workflow, f"CI workflow must include {contract!r}")
+    require("ubuntu-latest" not in workflow, "CI must not use a floating Ubuntu runner")
+    require(
+        workflow.count("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3") == 1,
+        "CI must use the annotated checkout pin",
+    )
     require("@v" not in workflow, "CI workflow actions must use immutable commits")
+
+    makefile = read_text("Makefile")
+    for contract in (
+        "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))",
+        '$(PYTHON) "$(ROOT)/scripts/check_ios_project.py"',
+        'cd "$(ROOT)" && xcodebuild',
+    ):
+        require(contract in makefile, f"Makefile must support invocation outside the repository: {contract}")
 
     docs = {
         "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],
@@ -258,6 +285,25 @@ def check_twitter_json_guards():
     require(
         "handler(image: nil, error)" in url_helper,
         "downloadImage must report failed image downloads without crashing",
+    )
+    for contract in (
+        'url.scheme?.lowercaseString != "https"',
+        "maximumImageBytes = 5 * 1024 * 1024",
+        "cachePolicy: .ReturnCacheDataElseLoad",
+        "timeoutInterval: 15",
+        "queue: NSOperationQueue()",
+        "response as? NSHTTPURLResponse",
+        "httpResponse!.statusCode < 200",
+        "httpResponse!.statusCode >= 300",
+        'mimeType?.hasPrefix("image/") != true',
+        "data.length > self.maximumImageBytes",
+        "dispatch_async(dispatch_get_main_queue())",
+        'downloadError(3, description: "Profile image could not be decoded")',
+    ):
+        require(contract in url_helper, f"profile image transport guard is missing: {contract}")
+    require(
+        "queue: NSOperationQueue.mainQueue()" not in url_helper,
+        "profile image network and decode work must not run on the main operation queue",
     )
     require(
         "garethpaul-app.appspot.com" not in url_helper + app_delegate,

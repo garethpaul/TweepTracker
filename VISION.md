@@ -30,6 +30,9 @@ Priority:
   coordinates
 - Complete Twitter profile-image lookups even when no usable image URL is
   returned
+- Keep profile image downloads HTTPS-only, bounded, and off the main operation
+  queue
+- Keep Twitter/Fabric credentials out of tracked plist files
 - Avoid hardcoded external upload paths for user coordinates
 - Keep GitHub Actions aligned with the local Python `make check` baseline
 

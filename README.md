@@ -53,7 +53,7 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 ## Testing and Verification
 
 - `make check` runs plist, storyboard, asset, Xcode project, Twitter JSON
-  parsing, profile-image loading, map coordinate order, Twitter login
+  parsing, HTTPS-only bounded profile-image loading, map coordinate order, Twitter login
   navigation, non-blocking map reveal timing, and no external coordinate upload
   contract checks. Static checks also require Twitter list-member request
   failures, timeline coordinate lookup failures, and profile-image lookup
@@ -63,8 +63,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - Static checks also require completed canonical plans under `docs/plans`.
 - GitHub Actions installs Python 3.12 and runs `make check` for pushes, pull
   requests, and manual runs with read-only repository permissions, a
-  five-minute timeout, and commit-pinned Node 24 actions. This validates static
-  contracts only; it does not validate the retired vendored SDK binaries.
+  five-minute timeout, a fixed Ubuntu 24.04 runner, and commit-pinned Node 24
+  actions. This validates static contracts only; it does not validate the
+  retired vendored SDK binaries.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -72,6 +73,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 ## Configuration and Secrets
 
 - Detected references to Twitter. Keep API keys, OAuth credentials, tokens, and account-specific values in local configuration only.
+- The checked-in app plist must not contain Twitter/Fabric consumer secrets or
+  weaken App Transport Security. Profile images are accepted only over HTTPS.
 
 ## Security and Privacy Notes
 

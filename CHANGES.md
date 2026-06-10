@@ -2,6 +2,13 @@
 
 ## 2026-06-10
 
+- Hardened remote profile-image loading with HTTPS-only URLs, status and MIME
+  validation, a five-megabyte limit, a timeout, and background network/decode
+  work with main-queue completion.
+- Added static guards against tracked Twitter/Fabric plist credentials and App
+  Transport Security weakening.
+- Fixed the CI runner to Ubuntu 24.04, annotated immutable action revisions,
+  scoped concurrency, and made Make targets independent of the caller's path.
 - Added a least-privilege GitHub Actions workflow that runs `make check` with
   commit-pinned Node 24 actions and a bounded runtime.
 - Extended the static project checker and docs to require the hosted CI
