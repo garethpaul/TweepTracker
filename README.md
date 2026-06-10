@@ -61,6 +61,10 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   Timeline coordinate checks require latitude and longitude JSON values to be
   numeric before map annotations are created.
 - Static checks also require completed canonical plans under `docs/plans`.
+- GitHub Actions installs Python 3.12 and runs `make check` for pushes, pull
+  requests, and manual runs with read-only repository permissions, a
+  five-minute timeout, and commit-pinned Node 24 actions. This validates static
+  contracts only; it does not validate the retired vendored SDK binaries.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -103,6 +107,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   lookup completion coverage.
 - See `docs/plans/2026-06-09-coordinate-number-validation.md` for numeric
   timeline coordinate validation.
+- See `docs/plans/2026-06-10-ci-baseline.md` for the hosted GitHub Actions
+  static contract gate.
 
 ## Contributing
 

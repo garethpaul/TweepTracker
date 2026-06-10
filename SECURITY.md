@@ -32,6 +32,10 @@ Helpful reports include:
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - Review found database, model, query, or persistence-related code; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
+- GitHub Actions runs `make check` with read-only repository permissions, a
+  five-minute timeout, and commit-pinned Node 24 actions so static Xcode,
+  Twitter JSON, map coordinate, and profile-image guardrails stay enforced.
+  The workflow does not execute or validate the retired vendored SDK binaries.
 
 ## Mobile Privacy Notes
 

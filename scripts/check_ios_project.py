@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT_FILE = ROOT / "location_tracker.xcodeproj/project.pbxproj"
+CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
 def fail(message):
@@ -88,6 +89,10 @@ def check_docs_plans():
         (plan_dir / "2026-06-09-coordinate-number-validation.md").exists(),
         "docs/plans/2026-06-09-coordinate-number-validation.md is missing",
     )
+    require(
+        (plan_dir / "2026-06-10-ci-baseline.md").exists(),
+        "docs/plans/2026-06-10-ci-baseline.md is missing",
+    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -96,6 +101,36 @@ def check_docs_plans():
         text = plan.read_text(encoding="utf-8")
         require("status: completed" in text.lower(), f"{plan.name} must be completed")
         require("make check" in text, f"{plan.name} must document make check verification")
+
+
+def check_ci_baseline_docs():
+    require(CI_WORKFLOW.exists(), ".github/workflows/check.yml is missing")
+    workflow = CI_WORKFLOW.read_text(encoding="utf-8")
+    for contract in (
+        "branches:\n      - master",
+        "pull_request:",
+        "workflow_dispatch:",
+        "permissions:\n  contents: read",
+        "timeout-minutes: 5",
+        "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10",
+        "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405",
+        'python-version: "3.12"',
+        "run: make check",
+    ):
+        require(contract in workflow, f"CI workflow must include {contract!r}")
+    require("@v" not in workflow, "CI workflow actions must use immutable commits")
+
+    docs = {
+        "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],
+        "VISION.md": ["GitHub Actions"],
+        "SECURITY.md": ["GitHub Actions", "make check"],
+        "CHANGES.md": ["GitHub Actions"],
+    }
+
+    for relative_path, required_phrases in docs.items():
+        text = read_text(relative_path)
+        for phrase in required_phrases:
+            require(phrase in text, f"{relative_path} must document {phrase}")
 
 
 def check_twitter_json_guards():
@@ -254,6 +289,7 @@ def main():
         check_test_plist_contract,
         check_resources_parse,
         check_docs_plans,
+        check_ci_baseline_docs,
         check_twitter_json_guards,
     ]
     try:

@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-10
+
+- Added a least-privilege GitHub Actions workflow that runs `make check` with
+  commit-pinned Node 24 actions and a bounded runtime.
+- Extended the static project checker and docs to require the hosted CI
+  verification path.
+
 ## 2026-06-09
 
 - Required Twitter timeline latitude and longitude values to be numeric before
