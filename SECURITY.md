@@ -29,12 +29,16 @@ Helpful reports include:
 - Review found external API integrations or credential-adjacent configuration; changes in those areas should receive security-focused review before merge.
 - Review found network clients, sockets, web APIs, or service endpoints; changes in those areas should receive security-focused review before merge.
 - Review found mobile permission or privacy-sensitive data handling; changes in those areas should receive security-focused review before merge.
+- Keep Twitter/Fabric credentials out of tracked plist files and do not add
+  broad App Transport Security exceptions.
+- Remote profile-image requests and final responses must use HTTPS and pass
+  status, image MIME type, size, and decode validation before display.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - Review found database, model, query, or persistence-related code; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
-- GitHub Actions runs `make check` for pushes and pull requests so the static
-  Xcode project, Twitter JSON, map coordinate, and profile-image guardrails
-  stay enforced before merge.
+- GitHub Actions runs `make check` with read-only repository permissions, a
+  Checkout credentials are not persisted, and the workflow does not execute or
+  validate the retired vendored SDK binaries.
 
 ## Mobile Privacy Notes
 

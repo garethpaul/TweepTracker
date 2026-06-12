@@ -58,16 +58,21 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 ## Testing and Verification
 
 - `make check` runs plist, storyboard, asset, Xcode project, Twitter JSON
-  parsing, profile-image loading, map coordinate order, Twitter login
+  parsing, HTTPS-only bounded profile-image loading, map coordinate order, Twitter login
   navigation, non-blocking map reveal timing, and no external coordinate upload
   contract checks. Static checks also require Twitter list-member request
   failures, timeline coordinate lookup failures, and profile-image lookup
   failures to complete with empty results so the map setup path can finish.
   Timeline coordinate checks require latitude and longitude JSON values to be
   numeric before map annotations are created.
+- Reused map annotation views clear stale avatars and only accept an async
+  image when they still represent the requesting Tweep.
 - Static checks also require completed canonical plans under `docs/plans`.
-- GitHub Actions installs Python 3.12 and runs `make check` for pushes and
-  pull requests.
+- GitHub Actions installs Python 3.12 and runs `make check` for all branch
+  pushes, pull requests, and manual runs with read-only repository permissions,
+  credential-free checkout, a five-minute timeout, a fixed Ubuntu 24.04 runner,
+  and commit-pinned Node 24 actions. This validates static contracts only; it
+  does not validate the retired vendored SDK binaries.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -75,6 +80,9 @@ When the required SDK or runtime is unavailable, use static checks and source re
 ## Configuration and Secrets
 
 - Detected references to Twitter. Keep API keys, OAuth credentials, tokens, and account-specific values in local configuration only.
+- The checked-in app plist must not contain Twitter/Fabric consumer secrets or
+  weaken App Transport Security. Profile-image requests and final responses
+  are accepted only over HTTPS.
 
 ## Security and Privacy Notes
 
@@ -111,7 +119,11 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-coordinate-number-validation.md` for numeric
   timeline coordinate validation.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the hosted GitHub Actions
-  baseline.
+  static contract gate.
+- See `docs/plans/2026-06-10-profile-image-transport.md` for HTTPS, response,
+  size, timeout, and queue boundaries on remote profile images.
+- See `docs/plans/2026-06-10-annotation-image-reuse.md` for asynchronous map
+  annotation image reuse guards.
 
 ## Contributing
 
