@@ -14,6 +14,7 @@ PROJECT_FILE = ROOT / "location_tracker.xcodeproj/project.pbxproj"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 IMAGE_TRANSPORT_PLAN = ROOT / "docs/plans/2026-06-10-profile-image-transport.md"
 ANNOTATION_REUSE_PLAN = ROOT / "docs/plans/2026-06-10-annotation-image-reuse.md"
+LOCATION_LOG_PRIVACY_PLAN = ROOT / "docs/plans/2026-06-12-location-log-privacy.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -109,6 +110,10 @@ def check_docs_plans():
     )
     require(IMAGE_TRANSPORT_PLAN.exists(), "docs/plans/2026-06-10-profile-image-transport.md is missing")
     require(ANNOTATION_REUSE_PLAN.exists(), "docs/plans/2026-06-10-annotation-image-reuse.md is missing")
+    require(
+        LOCATION_LOG_PRIVACY_PLAN.exists(),
+        "docs/plans/2026-06-12-location-log-privacy.md is missing",
+    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -363,6 +368,28 @@ def check_twitter_json_guards():
     )
 
 
+def check_location_log_privacy():
+    app_delegate = read_text("location_tracker/AppDelegate.swift")
+    view_controller = read_text("location_tracker/ViewController.swift")
+
+    for fragment in (
+        "func displayLocationInfo",
+        "containsPlacemark.locality",
+        "containsPlacemark.postalCode",
+        "containsPlacemark.administrativeArea",
+        "containsPlacemark.country",
+    ):
+        require(fragment not in view_controller, f"unused placemark logging must stay removed: {fragment}")
+
+    for fragment in (
+        "import CoreLocation",
+        "didUpdateToLocation",
+        "newLocation.coordinate.latitude",
+        "newLocation.coordinate.longitude",
+    ):
+        require(fragment not in app_delegate, f"unused coordinate logging must stay removed: {fragment}")
+
+
 def main():
     checks = [
         check_project_manifest_references,
@@ -372,6 +399,7 @@ def main():
         check_docs_plans,
         check_ci_baseline_docs,
         check_twitter_json_guards,
+        check_location_log_privacy,
     ]
     try:
         for check in checks:

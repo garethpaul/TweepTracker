@@ -33,12 +33,13 @@ Helpful reports include:
   broad App Transport Security exceptions.
 - Remote profile-image requests and final responses must use HTTPS and pass
   status, image MIME type, size, and decode validation before display.
+- Placemark fields and device coordinates must remain out of diagnostic logs.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - Review found database, model, query, or persistence-related code; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
-- GitHub Actions runs `make check` with read-only repository permissions, a
-  Checkout credentials are not persisted, and the workflow does not execute or
-  validate the retired vendored SDK binaries.
+- GitHub Actions runs `make check` on fixed Ubuntu 24.04 with read-only
+  repository permissions. Checkout credentials are not persisted, and the
+  workflow does not execute or validate the retired vendored SDK binaries.
 
 ## Mobile Privacy Notes
 

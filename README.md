@@ -64,7 +64,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   failures, timeline coordinate lookup failures, and profile-image lookup
   failures to complete with empty results so the map setup path can finish.
   Timeline coordinate checks require latitude and longitude JSON values to be
-  numeric before map annotations are created.
+  numeric before map annotations are created. Unused placemark and coordinate
+  logging surfaces are also prohibited.
 - Reused map annotation views clear stale avatars and only accept an async
   image when they still represent the requesting Tweep.
 - Static checks also require completed canonical plans under `docs/plans`.
@@ -83,6 +84,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - The checked-in app plist must not contain Twitter/Fabric consumer secrets or
   weaken App Transport Security. Profile-image requests and final responses
   are accepted only over HTTPS.
+- Placemark fields and device coordinates must not be copied into diagnostic
+  logs; map rendering continues to use guarded remote coordinate results.
 
 ## Security and Privacy Notes
 
@@ -124,6 +127,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   size, timeout, and queue boundaries on remote profile images.
 - See `docs/plans/2026-06-10-annotation-image-reuse.md` for asynchronous map
   annotation image reuse guards.
+- See `docs/plans/2026-06-12-location-log-privacy.md` for the removal of unused
+  placemark and coordinate logging surfaces.
 
 ## Contributing
 

@@ -3,7 +3,6 @@
 //
 
 import UIKit
-import CoreLocation
 import Fabric
 import TwitterKit
 import Crashlytics
@@ -51,13 +50,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(application: UIApplication!) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-    // location stuff
-    func locationManager(manager: CLLocationManager!, didUpdateToLocation newLocation: CLLocation!, fromLocation oldLocation: CLLocation!) {
-        //println(newLocation.coordinate.latitude)
-        //println(newLocation.coordinate.longitude)
-        //let latitude  = String(format: "%f", newLocation.coordinate.latitude)
-        //let longitude = String(format: "%f", newLocation.coordinate.latitude)
-    }
-
 }

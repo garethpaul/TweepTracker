@@ -196,21 +196,6 @@ class ViewController: UIViewController, MKMapViewDelegate {
         self.refresh.hidden = false
     }
 
-
-    func displayLocationInfo(placemark: CLPlacemark?) {
-        if let containsPlacemark = placemark {
-            //stop updating location to save battery life
-            let locality = (containsPlacemark.locality != nil) ? containsPlacemark.locality : ""
-            let postalCode = (containsPlacemark.postalCode != nil) ? containsPlacemark.postalCode : ""
-            let administrativeArea = (containsPlacemark.administrativeArea != nil) ? containsPlacemark.administrativeArea : ""
-            let country = (containsPlacemark.country != nil) ? containsPlacemark.country : ""
-            println(locality)
-            println(postalCode)
-            println(administrativeArea)
-            println(country)
-                    }
-
-    }
     func locateTweep(handle: String){
         TweepLocation(handle){ (result: [Double]) in
             if result.count < 2 {

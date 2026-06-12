@@ -1,5 +1,14 @@
 # Changes
 
+## 2026-06-12
+
+- Removed an unused placemark helper that logged locality, postal code,
+  administrative area, and country.
+- Removed a dormant AppDelegate location callback and commented coordinate
+  logging examples.
+- Added static privacy contracts preventing both location-log surfaces from
+  returning.
+
 ## 2026-06-10
 
 - Guarded asynchronous avatar assignment against map annotation reuse and

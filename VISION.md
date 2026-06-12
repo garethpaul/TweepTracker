@@ -35,12 +35,13 @@ Priority:
 - Prevent reused map pins from displaying another Tweep's delayed avatar
 - Keep Twitter/Fabric credentials out of tracked plist files
 - Avoid hardcoded external upload paths for user coordinates
+- Keep placemark fields and device coordinates out of diagnostic logs
 - Keep GitHub Actions aligned with the local Python `make check` baseline
 
 Next priorities:
 
 - Add setup notes for legacy SDK requirements and current API limitations
-- Add privacy notes for geolocation and profile images
+- Add consent-oriented runtime UX before any future live geolocation feature
 - Replace hardcoded supplemental handles with configurable demo data
 - Modernize Swift only in a dedicated pass
 
