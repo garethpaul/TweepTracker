@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT_FILE = ROOT / "location_tracker.xcodeproj/project.pbxproj"
+CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
 def fail(message):
@@ -88,6 +89,10 @@ def check_docs_plans():
         (plan_dir / "2026-06-09-coordinate-number-validation.md").exists(),
         "docs/plans/2026-06-09-coordinate-number-validation.md is missing",
     )
+    require(
+        (plan_dir / "2026-06-10-ci-baseline.md").exists(),
+        "docs/plans/2026-06-10-ci-baseline.md is missing",
+    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -96,6 +101,27 @@ def check_docs_plans():
         text = plan.read_text(encoding="utf-8")
         require("status: completed" in text.lower(), f"{plan.name} must be completed")
         require("make check" in text, f"{plan.name} must document make check verification")
+
+
+def check_ci_baseline_docs():
+    require(CI_WORKFLOW.exists(), ".github/workflows/check.yml is missing")
+    workflow = CI_WORKFLOW.read_text(encoding="utf-8")
+    require("actions/checkout@v4" in workflow, "CI workflow must check out the repository")
+    require("actions/setup-python@v5" in workflow, "CI workflow must install Python")
+    require('python-version: "3.12"' in workflow, "CI workflow must use Python 3.12")
+    require("run: make check" in workflow, "CI workflow must run make check")
+
+    docs = {
+        "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],
+        "VISION.md": ["GitHub Actions"],
+        "SECURITY.md": ["GitHub Actions", "make check"],
+        "CHANGES.md": ["GitHub Actions"],
+    }
+
+    for relative_path, required_phrases in docs.items():
+        text = read_text(relative_path)
+        for phrase in required_phrases:
+            require(phrase in text, f"{relative_path} must document {phrase}")
 
 
 def check_twitter_json_guards():
@@ -254,6 +280,7 @@ def main():
         check_test_plist_contract,
         check_resources_parse,
         check_docs_plans,
+        check_ci_baseline_docs,
         check_twitter_json_guards,
     ]
     try:

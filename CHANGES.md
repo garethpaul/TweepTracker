@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-10
+
+- Added a GitHub Actions workflow that installs Python 3.12 and runs
+  `make check`.
+- Extended the static project checker and docs to require the hosted CI
+  verification path.
+
 ## 2026-06-09
 
 - Required Twitter timeline latitude and longitude values to be numeric before

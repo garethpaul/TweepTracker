@@ -31,6 +31,7 @@ Priority:
 - Complete Twitter profile-image lookups even when no usable image URL is
   returned
 - Avoid hardcoded external upload paths for user coordinates
+- Keep GitHub Actions aligned with the local Python `make check` baseline
 
 Next priorities:
 
@@ -46,6 +47,8 @@ Contribution rules:
 - Keep demo users configurable and clearly documented.
 - Include simulator/device notes for map behavior changes.
 - Preserve map coordinate guards for malformed Twitter timeline results.
+- Keep `.github/workflows/check.yml` in sync with the local static project
+  checker.
 
 ## Security And Responsible Use
 
