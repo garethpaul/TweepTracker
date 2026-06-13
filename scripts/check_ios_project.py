@@ -16,6 +16,7 @@ IMAGE_TRANSPORT_PLAN = ROOT / "docs/plans/2026-06-10-profile-image-transport.md"
 ANNOTATION_REUSE_PLAN = ROOT / "docs/plans/2026-06-10-annotation-image-reuse.md"
 LOCATION_LOG_PRIVACY_PLAN = ROOT / "docs/plans/2026-06-12-location-log-privacy.md"
 URLSESSION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-urlsession.md"
+IMAGE_TASK_CANCELLATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-task-cancellation.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -118,6 +119,10 @@ def check_docs_plans():
     require(
         URLSESSION_PLAN.exists(),
         "docs/plans/2026-06-13-profile-image-urlsession.md is missing",
+    )
+    require(
+        IMAGE_TASK_CANCELLATION_PLAN.exists(),
+        "docs/plans/2026-06-13-profile-image-task-cancellation.md is missing",
     )
 
     plans = sorted(plan_dir.glob("*.md"))
@@ -288,7 +293,7 @@ def check_twitter_json_guards():
         "profile image annotation must guard decoded images",
     )
     for contract in (
-        "pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)",
+        "pinView = TweepPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)",
         "pinView!.image = nil",
         "if let tweep = annotation as? TweepAnnotation",
         "if let currentAnnotation = pinView?.annotation",
@@ -301,7 +306,7 @@ def check_twitter_json_guards():
     )
     require(
         view_controller.count(
-            "pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)"
+            "pinView = TweepPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)"
         )
         == 1,
         "map annotation views must only be created when dequeue returns nil",
@@ -319,8 +324,63 @@ def check_twitter_json_guards():
         "map setup must reveal the map asynchronously on the main queue",
     )
     require(
-        "func downloadImage(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void))" in url_helper,
+        "func downloadImage(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void)) -> NSURLSessionDataTask?" in url_helper,
         "downloadImage must expose optional decoded images",
+    )
+    for contract in (
+        "private class TweepPinAnnotationView: MKPinAnnotationView",
+        "var imageTask: NSURLSessionDataTask?",
+        "override func prepareForReuse()",
+        "pinView!.imageTask = url.downloadImage",
+    ):
+        require(contract in view_controller + url_helper, f"profile image cancellation guard is missing: {contract}")
+    prepare_for_reuse = re.search(
+        r"override func prepareForReuse\(\) \{(?P<body>.*?)\n    \}",
+        view_controller,
+        re.DOTALL,
+    )
+    require(prepare_for_reuse is not None, "pin view must override prepareForReuse")
+    prepare_body = prepare_for_reuse.group("body")
+    for contract in (
+        "super.prepareForReuse()",
+        "imageTask?.cancel()",
+        "imageTask = nil",
+        "image = nil",
+    ):
+        require(contract in prepare_body, f"prepareForReuse cancellation is missing: {contract}")
+    require(
+        prepare_body.index("imageTask?.cancel()") < prepare_body.index("imageTask = nil"),
+        "prepareForReuse must cancel the image task before clearing it",
+    )
+    reassignment = re.search(
+        r"if pinView == nil \{.*?\n            \}\n            else \{(?P<body>.*?)\n            \}",
+        view_controller,
+        re.DOTALL,
+    )
+    require(reassignment is not None, "annotation view reassignment block must remain explicit")
+    reassignment_body = reassignment.group("body")
+    for contract in (
+        "pinView!.imageTask?.cancel()",
+        "pinView!.imageTask = nil",
+        "pinView!.annotation = annotation",
+    ):
+        require(contract in reassignment_body, f"annotation reassignment is missing: {contract}")
+    require(
+        reassignment_body.index("pinView!.imageTask?.cancel()")
+        < reassignment_body.index("pinView!.annotation = annotation"),
+        "annotation reassignment must cancel obsolete image work first",
+    )
+    require(url_helper.count("return nil") == 1, "HTTPS rejection must return one nil task")
+    require(url_helper.count("return task") == 1, "downloadImage must return its one resumed task")
+    require(
+        url_helper.index('url.scheme?.lowercaseString != "https"')
+        < url_helper.index("return nil")
+        < url_helper.index("let imageRequest"),
+        "non-HTTPS image URLs must return nil before request creation",
+    )
+    require(
+        url_helper.index("task.resume()") < url_helper.index("return task"),
+        "downloadImage must resume the task before returning it",
     )
     require(
         "UIImage(data: data)!" not in url_helper,
