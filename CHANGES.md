@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Added per-pin request generations so matching profile-image completions
+  release task ownership while stale callbacks cannot clear newer work.
 - Added per-pin URLSession task ownership and cancellation so reused annotation
   views stop obsolete profile-image network and decode work.
 - Replaced deprecated asynchronous `NSURLConnection` profile-image loading with

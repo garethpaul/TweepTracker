@@ -1,6 +1,6 @@
 # Profile Image Request Generation
 
-## Status: Planned
+## Status: Completed
 
 ## Context
 
@@ -67,3 +67,29 @@ task release ordering, annotation identity, and completed plan evidence.
   retired Twitter dependencies, project membership, or legacy Swift syntax.
 - Do not add caching, retries, new dependencies, live network calls, or claim
   simulator execution on Linux.
+
+## Work Completed
+
+- Added a per-pin request generation and centralized cancellation that
+  invalidates the generation before cancelling and releasing the task.
+- Captured a fresh generation for each profile-image request and ignored stale
+  completions before they can clear ownership or render an avatar.
+- Cleared the matching task before preserving the existing annotation identity,
+  decoded-image, and rendering checks.
+- Extended portable source and documentation contracts for generation,
+  invalidation, matching, release ordering, and maintenance records.
+
+## Verification
+
+- Local and external-working-directory `make check` passed all portable project
+  contract groups under 60-second hard timeouts. Both runs truthfully reported
+  iOS test and build skips because `xcodebuild` is unavailable on this Linux
+  host.
+- Focused hostile mutations for generation removal, cancellation invalidation,
+  start capture, completion matching, task release and ordering, annotation
+  identity, documentation drift, and plan status were rejected.
+- Python compilation, plist/XML/JSON/workflow parsing, intended-path,
+  generated-artifact, `git diff --check`, and changed-line secret audits passed
+  before shipment.
+- No live Twitter request, profile-image download, simulator run, or map UI
+  execution was performed.

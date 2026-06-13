@@ -9,11 +9,17 @@ import TwitterKit
 
 private class TweepPinAnnotationView: MKPinAnnotationView {
     var imageTask: NSURLSessionDataTask?
+    var imageRequestGeneration = 0
+
+    func cancelImageRequest() {
+        imageRequestGeneration += 1
+        imageTask?.cancel()
+        imageTask = nil
+    }
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        imageTask?.cancel()
-        imageTask = nil
+        cancelImageRequest()
         image = nil
     }
 }
@@ -127,8 +133,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 pinView = TweepPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             }
             else {
-                pinView!.imageTask?.cancel()
-                pinView!.imageTask = nil
+                pinView!.cancelImageRequest()
                 pinView!.annotation = annotation
             }
 
@@ -138,12 +143,19 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 let url = URL()
                 let url_string = tweep.imageURL
                 if let imageURL = NSURL(string: url_string) {
+                    pinView!.imageRequestGeneration += 1
+                    let imageRequestGeneration = pinView!.imageRequestGeneration
                     pinView!.imageTask = url.downloadImage(imageURL, {image, error in
-                        if let newImg = image {
-                            if let currentAnnotation = pinView?.annotation {
-                                if currentAnnotation === annotation {
-                                    let circle = CircleImage(RBResizeImage(newImg, CGSize(width: 50, height: 50)))
-                                    pinView!.image = circle
+                        if let currentPinView = pinView {
+                            if currentPinView.imageRequestGeneration == imageRequestGeneration {
+                                currentPinView.imageTask = nil
+                                if let currentAnnotation = currentPinView.annotation {
+                                    if currentAnnotation === annotation {
+                                        if let newImg = image {
+                                            let circle = CircleImage(RBResizeImage(newImg, CGSize(width: 50, height: 50)))
+                                            currentPinView.image = circle
+                                        }
+                                    }
                                 }
                             }
                         }

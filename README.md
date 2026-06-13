@@ -68,7 +68,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   logging surfaces are also prohibited.
 - Reused map annotation views cancel obsolete profile-image tasks, clear stale
   avatars, and only accept an async image when they still represent the
-  requesting Tweep.
+  requesting Tweep. Per-pin request generations keep late cancelled callbacks
+  from releasing newer tasks, while matching completions release their task
+  ownership before handling an image or error.
 - Static checks also require completed canonical plans under `docs/plans`.
 - GitHub Actions installs Python 3.12 and runs `make check` for all branch
   pushes, pull requests, and manual runs with read-only repository permissions,
@@ -130,6 +132,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   profile image transport migration.
 - See `docs/plans/2026-06-13-profile-image-task-cancellation.md` for per-pin
   URLSession task ownership and reuse cancellation.
+- See `docs/plans/2026-06-13-profile-image-request-generation.md` for stale
+  callback rejection and matching-completion task release.
 - See `docs/plans/2026-06-10-annotation-image-reuse.md` for asynchronous map
   annotation image reuse guards.
 - See `docs/plans/2026-06-12-location-log-privacy.md` for the removal of unused

@@ -17,6 +17,7 @@ ANNOTATION_REUSE_PLAN = ROOT / "docs/plans/2026-06-10-annotation-image-reuse.md"
 LOCATION_LOG_PRIVACY_PLAN = ROOT / "docs/plans/2026-06-12-location-log-privacy.md"
 URLSESSION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-urlsession.md"
 IMAGE_TASK_CANCELLATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-task-cancellation.md"
+IMAGE_REQUEST_GENERATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-request-generation.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -123,6 +124,10 @@ def check_docs_plans():
     require(
         IMAGE_TASK_CANCELLATION_PLAN.exists(),
         "docs/plans/2026-06-13-profile-image-task-cancellation.md is missing",
+    )
+    require(
+        IMAGE_REQUEST_GENERATION_PLAN.exists(),
+        "docs/plans/2026-06-13-profile-image-request-generation.md is missing",
     )
 
     plans = sorted(plan_dir.glob("*.md"))
@@ -296,7 +301,7 @@ def check_twitter_json_guards():
         "pinView = TweepPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)",
         "pinView!.image = nil",
         "if let tweep = annotation as? TweepAnnotation",
-        "if let currentAnnotation = pinView?.annotation",
+        "if let currentAnnotation = currentPinView.annotation",
         "if currentAnnotation === annotation",
     ):
         require(contract in view_controller, f"annotation image reuse guard is missing: {contract}")
@@ -330,10 +335,31 @@ def check_twitter_json_guards():
     for contract in (
         "private class TweepPinAnnotationView: MKPinAnnotationView",
         "var imageTask: NSURLSessionDataTask?",
+        "var imageRequestGeneration = 0",
+        "func cancelImageRequest()",
         "override func prepareForReuse()",
         "pinView!.imageTask = url.downloadImage",
     ):
         require(contract in view_controller + url_helper, f"profile image cancellation guard is missing: {contract}")
+    cancel_image_request = re.search(
+        r"func cancelImageRequest\(\) \{(?P<body>.*?)\n    \}",
+        view_controller,
+        re.DOTALL,
+    )
+    require(cancel_image_request is not None, "pin view must centralize image request cancellation")
+    cancel_body = cancel_image_request.group("body")
+    for contract in (
+        "imageRequestGeneration += 1",
+        "imageTask?.cancel()",
+        "imageTask = nil",
+    ):
+        require(contract in cancel_body, f"image request cancellation is missing: {contract}")
+    require(
+        cancel_body.index("imageRequestGeneration += 1")
+        < cancel_body.index("imageTask?.cancel()")
+        < cancel_body.index("imageTask = nil"),
+        "image request cancellation must invalidate, cancel, then release the task",
+    )
     prepare_for_reuse = re.search(
         r"override func prepareForReuse\(\) \{(?P<body>.*?)\n    \}",
         view_controller,
@@ -343,14 +369,13 @@ def check_twitter_json_guards():
     prepare_body = prepare_for_reuse.group("body")
     for contract in (
         "super.prepareForReuse()",
-        "imageTask?.cancel()",
-        "imageTask = nil",
+        "cancelImageRequest()",
         "image = nil",
     ):
         require(contract in prepare_body, f"prepareForReuse cancellation is missing: {contract}")
     require(
-        prepare_body.index("imageTask?.cancel()") < prepare_body.index("imageTask = nil"),
-        "prepareForReuse must cancel the image task before clearing it",
+        prepare_body.index("cancelImageRequest()") < prepare_body.index("image = nil"),
+        "prepareForReuse must cancel image work before clearing the rendered image",
     )
     reassignment = re.search(
         r"if pinView == nil \{.*?\n            \}\n            else \{(?P<body>.*?)\n            \}",
@@ -360,16 +385,54 @@ def check_twitter_json_guards():
     require(reassignment is not None, "annotation view reassignment block must remain explicit")
     reassignment_body = reassignment.group("body")
     for contract in (
-        "pinView!.imageTask?.cancel()",
-        "pinView!.imageTask = nil",
+        "pinView!.cancelImageRequest()",
         "pinView!.annotation = annotation",
     ):
         require(contract in reassignment_body, f"annotation reassignment is missing: {contract}")
     require(
-        reassignment_body.index("pinView!.imageTask?.cancel()")
+        reassignment_body.index("pinView!.cancelImageRequest()")
         < reassignment_body.index("pinView!.annotation = annotation"),
         "annotation reassignment must cancel obsolete image work first",
     )
+    request_start = re.search(
+        r"pinView!\.imageRequestGeneration \+= 1\s+"
+        r"let imageRequestGeneration = pinView!\.imageRequestGeneration\s+"
+        r"pinView!\.imageTask = url\.downloadImage",
+        view_controller,
+    )
+    require(request_start is not None, "profile image requests must capture a new generation")
+    completion = re.search(
+        r"pinView!\.imageTask = url\.downloadImage\(imageURL, \{image, error in"
+        r"(?P<body>.*?)\n                    \}\)",
+        view_controller,
+        re.DOTALL,
+    )
+    require(completion is not None, "profile image completion block must remain explicit")
+    completion_body = completion.group("body")
+    for contract in (
+        "if let currentPinView = pinView",
+        "currentPinView.imageRequestGeneration == imageRequestGeneration",
+        "currentPinView.imageTask = nil",
+        "if let currentAnnotation = currentPinView.annotation",
+        "if currentAnnotation === annotation",
+        "if let newImg = image",
+        "currentPinView.image = circle",
+    ):
+        require(contract in completion_body, f"profile image completion guard is missing: {contract}")
+    require(
+        completion_body.index("currentPinView.imageRequestGeneration == imageRequestGeneration")
+        < completion_body.index("currentPinView.imageTask = nil")
+        < completion_body.index("if currentAnnotation === annotation")
+        < completion_body.index("currentPinView.image = circle"),
+        "matching completion must release ownership before annotation-checked rendering",
+    )
+    for path, fragment in (
+        ("README.md", "Per-pin request generations keep late cancelled callbacks"),
+        ("SECURITY.md", "match the pin's active request generation"),
+        ("VISION.md", "stale callbacks clear"),
+        ("CHANGES.md", "matching profile-image completions"),
+    ):
+        require(fragment in read_text(path), f"{path} must document image request generation guards")
     require(url_helper.count("return nil") == 1, "HTTPS rejection must return one nil task")
     require(url_helper.count("return task") == 1, "downloadImage must return its one resumed task")
     require(

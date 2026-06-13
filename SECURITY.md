@@ -35,6 +35,8 @@ Helpful reports include:
   status, image MIME type, size, and decode validation before display.
 - Reused map pins must cancel obsolete profile-image tasks before accepting a
   new annotation while retaining the annotation-identity callback guard.
+- Profile-image callbacks must match the pin's active request generation before
+  releasing task ownership or changing the rendered avatar.
 - Placemark fields and device coordinates must remain out of diagnostic logs.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - Review found database, model, query, or persistence-related code; changes in those areas should receive security-focused review before merge.

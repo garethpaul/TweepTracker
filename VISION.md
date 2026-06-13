@@ -34,6 +34,8 @@ Priority:
   queue
 - Keep profile image transport on the session-based networking API
 - Cancel obsolete profile image tasks when map pins are reused
+- Release completed profile image tasks without letting stale callbacks clear
+  newer per-pin work
 - Prevent reused map pins from displaying another Tweep's delayed avatar
 - Keep Twitter/Fabric credentials out of tracked plist files
 - Avoid hardcoded external upload paths for user coordinates
