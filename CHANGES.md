@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-13
+
+- Replaced deprecated asynchronous `NSURLConnection` profile-image loading with
+  an explicitly resumed `NSURLSession` data task while retaining all transport
+  and callback safeguards.
+
 ## 2026-06-12
 
 - Removed an unused placemark helper that logged locality, postal code,

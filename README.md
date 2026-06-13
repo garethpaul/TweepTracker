@@ -125,6 +125,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   static contract gate.
 - See `docs/plans/2026-06-10-profile-image-transport.md` for HTTPS, response,
   size, timeout, and queue boundaries on remote profile images.
+- See `docs/plans/2026-06-13-profile-image-urlsession.md` for the session-based
+  profile image transport migration.
 - See `docs/plans/2026-06-10-annotation-image-reuse.md` for asynchronous map
   annotation image reuse guards.
 - See `docs/plans/2026-06-12-location-log-privacy.md` for the removal of unused

@@ -30,9 +30,9 @@ class URL{
             cachePolicy: .ReturnCacheDataElseLoad,
             timeoutInterval: 15
         )
-        NSURLConnection.sendAsynchronousRequest(imageRequest,
-            queue: NSOperationQueue(),
-            completionHandler:{response, data, error in
+        let task = NSURLSession.sharedSession().dataTaskWithRequest(
+            imageRequest,
+            completionHandler: {data, response, error in
                 if error != nil || data == nil {
                     dispatch_async(dispatch_get_main_queue()) {
                         handler(image: nil, error)
@@ -59,5 +59,6 @@ class URL{
                         self.downloadError(3, description: "Profile image could not be decoded") : nil)
                 }
         })
+        task.resume()
     }
 }

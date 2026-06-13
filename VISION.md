@@ -32,6 +32,7 @@ Priority:
   returned
 - Keep profile image downloads HTTPS-only, bounded, and off the main operation
   queue
+- Keep profile image transport on the session-based networking API
 - Prevent reused map pins from displaying another Tweep's delayed avatar
 - Keep Twitter/Fabric credentials out of tracked plist files
 - Avoid hardcoded external upload paths for user coordinates

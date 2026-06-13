@@ -15,6 +15,7 @@ CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 IMAGE_TRANSPORT_PLAN = ROOT / "docs/plans/2026-06-10-profile-image-transport.md"
 ANNOTATION_REUSE_PLAN = ROOT / "docs/plans/2026-06-10-annotation-image-reuse.md"
 LOCATION_LOG_PRIVACY_PLAN = ROOT / "docs/plans/2026-06-12-location-log-privacy.md"
+URLSESSION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-urlsession.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -113,6 +114,10 @@ def check_docs_plans():
     require(
         LOCATION_LOG_PRIVACY_PLAN.exists(),
         "docs/plans/2026-06-12-location-log-privacy.md is missing",
+    )
+    require(
+        URLSESSION_PLAN.exists(),
+        "docs/plans/2026-06-13-profile-image-urlsession.md is missing",
     )
 
     plans = sorted(plan_dir.glob("*.md"))
@@ -331,7 +336,9 @@ def check_twitter_json_guards():
         "maximumImageBytes = 5 * 1024 * 1024",
         "cachePolicy: .ReturnCacheDataElseLoad",
         "timeoutInterval: 15",
-        "queue: NSOperationQueue()",
+        "NSURLSession.sharedSession()",
+        "dataTaskWithRequest(",
+        "task.resume()",
         "response as? NSHTTPURLResponse",
         "httpResponse!.statusCode < 200",
         "httpResponse!.statusCode >= 300",
@@ -341,6 +348,14 @@ def check_twitter_json_guards():
         'downloadError(3, description: "Profile image could not be decoded")',
     ):
         require(contract in url_helper, f"profile image transport guard is missing: {contract}")
+    require(
+        "NSURLConnection" not in url_helper,
+        "profile image transport must not restore deprecated NSURLConnection",
+    )
+    require(
+        url_helper.count("dispatch_async(dispatch_get_main_queue())") == 3,
+        "every profile image completion path must return on the main queue",
+    )
     require(
         "queue: NSOperationQueue.mainQueue()" not in url_helper,
         "profile image network and decode work must not run on the main operation queue",
