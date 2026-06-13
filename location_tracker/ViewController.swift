@@ -7,6 +7,17 @@ import CoreLocation
 import MapKit
 import TwitterKit
 
+private class TweepPinAnnotationView: MKPinAnnotationView {
+    var imageTask: NSURLSessionDataTask?
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imageTask?.cancel()
+        imageTask = nil
+        image = nil
+    }
+}
+
 class ViewController: UIViewController, MKMapViewDelegate {
 
     var logoView: UIImageView!
@@ -111,11 +122,13 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
             let reuseId = "pin"
 
-            var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
+            var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? TweepPinAnnotationView
             if pinView == nil {
-                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+                pinView = TweepPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             }
             else {
+                pinView!.imageTask?.cancel()
+                pinView!.imageTask = nil
                 pinView!.annotation = annotation
             }
 
@@ -125,7 +138,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 let url = URL()
                 let url_string = tweep.imageURL
                 if let imageURL = NSURL(string: url_string) {
-                    url.downloadImage(imageURL, {image, error in
+                    pinView!.imageTask = url.downloadImage(imageURL, {image, error in
                         if let newImg = image {
                             if let currentAnnotation = pinView?.annotation {
                                 if currentAnnotation === annotation {

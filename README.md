@@ -66,8 +66,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   Timeline coordinate checks require latitude and longitude JSON values to be
   numeric before map annotations are created. Unused placemark and coordinate
   logging surfaces are also prohibited.
-- Reused map annotation views clear stale avatars and only accept an async
-  image when they still represent the requesting Tweep.
+- Reused map annotation views cancel obsolete profile-image tasks, clear stale
+  avatars, and only accept an async image when they still represent the
+  requesting Tweep.
 - Static checks also require completed canonical plans under `docs/plans`.
 - GitHub Actions installs Python 3.12 and runs `make check` for all branch
   pushes, pull requests, and manual runs with read-only repository permissions,
@@ -127,6 +128,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   size, timeout, and queue boundaries on remote profile images.
 - See `docs/plans/2026-06-13-profile-image-urlsession.md` for the session-based
   profile image transport migration.
+- See `docs/plans/2026-06-13-profile-image-task-cancellation.md` for per-pin
+  URLSession task ownership and reuse cancellation.
 - See `docs/plans/2026-06-10-annotation-image-reuse.md` for asynchronous map
   annotation image reuse guards.
 - See `docs/plans/2026-06-12-location-log-privacy.md` for the removal of unused

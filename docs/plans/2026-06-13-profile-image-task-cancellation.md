@@ -1,6 +1,6 @@
 # Profile Image Task Cancellation
 
-## Status: In Progress
+## Status: Completed
 
 ## Context
 
@@ -50,7 +50,9 @@ network and decode resources until completion.
 
 ## Verification
 
-- Local and external-directory `make check` with truthful Xcode skips
+- Local and external-directory `make check` passed all portable project
+  contracts with truthful iOS test/build skips because Xcode is unavailable.
 - Hostile mutations removing return, ownership, cancellation, or identity guard
+  were rejected.
 - Python compilation, structured-file parsing, `git diff --check`, and focused
-  secret/artifact review
+  secret/artifact review passed.

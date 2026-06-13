@@ -18,11 +18,11 @@ class URL{
         )
     }
 
-    func downloadImage(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void))
+    func downloadImage(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void)) -> NSURLSessionDataTask?
     {
         if url.scheme?.lowercaseString != "https" {
             handler(image: nil, downloadError(1, description: "Profile images must use HTTPS"))
-            return
+            return nil
         }
 
         let imageRequest = NSURLRequest(
@@ -60,5 +60,6 @@ class URL{
                 }
         })
         task.resume()
+        return task
     }
 }

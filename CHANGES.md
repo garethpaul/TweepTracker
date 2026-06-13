@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Added per-pin URLSession task ownership and cancellation so reused annotation
+  views stop obsolete profile-image network and decode work.
 - Replaced deprecated asynchronous `NSURLConnection` profile-image loading with
   an explicitly resumed `NSURLSession` data task while retaining all transport
   and callback safeguards.
