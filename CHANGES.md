@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-14
+
+- Documented the legacy SDK compatibility boundary for the iOS 8.0/8.1
+  project settings, Swift 2-era source, vendored Twitter/Fabric binaries,
+  local-only credentials, and unverified live API behavior.
+
 ## 2026-06-13
 
 - Added per-pin request generations so matching profile-image completions

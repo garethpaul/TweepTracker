@@ -49,6 +49,21 @@ cd TweepTracker
 
 The setup commands above are derived from repository files. Legacy mobile, Python, or JavaScript samples may require older SDKs or package versions than a modern workstation uses by default.
 
+### Legacy SDK Compatibility Boundary
+
+- The checked-in Xcode project contains iOS 8.0 and 8.1 deployment settings,
+  and the application uses Swift 2-era UIKit and app-delegate syntax. A build
+  with current Xcode or current Swift is not claimed.
+- TwitterKit, Fabric, and Crashlytics are vendored historical binaries. The
+  portable `make check` gate parses project resources and application
+  contracts; it does not rebuild or execute those SDKs.
+- Live Twitter login, Twitter API, map, and crash-reporting compatibility are
+  not verified. Any manual experiment requires a compatible historical Apple
+  toolchain, service availability, and local untracked credentials; none are
+  supplied by this repository.
+- Treat this project as a static maintenance and historical reference sample
+  unless a dedicated modernization pass replaces the retired integrations.
+
 ## Running or Using the Project
 
 - Open `location_tracker.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
@@ -140,6 +155,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   placemark and coordinate logging surfaces.
 - See `docs/plans/2026-06-14-make-root-override-protection.md` for repository-
   anchored Make verification under hostile root assignments.
+- See `docs/plans/2026-06-14-legacy-sdk-compatibility.md` for the checked-in
+  iOS, Swift, vendored SDK, credential, and live API compatibility boundary.
 
 ## Contributing
 

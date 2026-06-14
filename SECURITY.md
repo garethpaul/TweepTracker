@@ -31,6 +31,9 @@ Helpful reports include:
 - Review found mobile permission or privacy-sensitive data handling; changes in those areas should receive security-focused review before merge.
 - Keep Twitter/Fabric credentials out of tracked plist files and do not add
   broad App Transport Security exceptions.
+- The legacy SDK compatibility boundary treats the vendored TwitterKit,
+  Fabric, and Crashlytics binaries as historical artifacts; live use requires
+  local untracked credentials and is not covered by portable verification.
 - Remote profile-image requests and final responses must use HTTPS and pass
   status, image MIME type, size, and decode validation before display.
 - Reused map pins must cancel obsolete profile-image tasks before accepting a

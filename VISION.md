@@ -41,10 +41,11 @@ Priority:
 - Avoid hardcoded external upload paths for user coordinates
 - Keep placemark fields and device coordinates out of diagnostic logs
 - Keep GitHub Actions aligned with the local Python `make check` baseline
+- Keep the legacy SDK compatibility boundary explicit for iOS 8-era project
+  settings, Swift 2-era source, vendored binaries, and unverified live APIs
 
 Next priorities:
 
-- Add setup notes for legacy SDK requirements and current API limitations
 - Add consent-oriented runtime UX before any future live geolocation feature
 - Replace hardcoded supplemental handles with configurable demo data
 - Modernize Swift only in a dedicated pass

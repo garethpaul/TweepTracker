@@ -19,6 +19,7 @@ URLSESSION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-urlsession.md"
 IMAGE_TASK_CANCELLATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-task-cancellation.md"
 IMAGE_REQUEST_GENERATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-request-generation.md"
 ROOT_OVERRIDE_PLAN = ROOT / "docs/plans/2026-06-14-make-root-override-protection.md"
+LEGACY_SDK_PLAN = ROOT / "docs/plans/2026-06-14-legacy-sdk-compatibility.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -134,6 +135,10 @@ def check_docs_plans():
         ROOT_OVERRIDE_PLAN.exists(),
         "docs/plans/2026-06-14-make-root-override-protection.md is missing",
     )
+    require(
+        LEGACY_SDK_PLAN.exists(),
+        "docs/plans/2026-06-14-legacy-sdk-compatibility.md is missing",
+    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -142,6 +147,48 @@ def check_docs_plans():
         text = plan.read_text(encoding="utf-8")
         require("status: completed" in text.lower(), f"{plan.name} must be completed")
         require("make check" in text, f"{plan.name} must document make check verification")
+
+    legacy_plan = LEGACY_SDK_PLAN.read_text(encoding="utf-8")
+    for evidence in (
+        "repository and external-directory `make check` passed",
+        "hostile legacy SDK documentation mutations were rejected",
+    ):
+        require(evidence in legacy_plan, f"legacy SDK plan must record verification evidence: {evidence}")
+
+    for relative_path in ("README.md", "SECURITY.md", "VISION.md", "CHANGES.md"):
+        require(
+            "legacy sdk compatibility boundary" in read_text(relative_path).lower(),
+            f"{relative_path} must document the legacy SDK compatibility boundary",
+        )
+
+    project = PROJECT_FILE.read_text(encoding="utf-8")
+    app_delegate = read_text("location_tracker/AppDelegate.swift")
+    require(
+        project.count("IPHONEOS_DEPLOYMENT_TARGET = 8.0;") == 2,
+        "project must retain both iOS 8.0 deployment settings",
+    )
+    require(
+        project.count("IPHONEOS_DEPLOYMENT_TARGET = 8.1;") == 2,
+        "project must retain both iOS 8.1 deployment settings",
+    )
+    require("@UIApplicationMain" in app_delegate, "Swift 2-era app entry point must remain explicit")
+    require(
+        "UIApplication.sharedApplication()" in app_delegate,
+        "Swift 2-era UIKit syntax must remain explicit",
+    )
+
+    readme = read_text("README.md")
+    for contract in (
+        "### Legacy SDK Compatibility Boundary",
+        "iOS 8.0 and 8.1 deployment settings",
+        "Swift 2-era UIKit and app-delegate syntax",
+        "TwitterKit, Fabric, and Crashlytics are vendored historical binaries",
+        "Live Twitter login, Twitter API, map, and crash-reporting compatibility are",
+        "local untracked credentials",
+        "portable `make check` gate",
+        "current Xcode or current Swift is not claimed",
+    ):
+        require(contract in readme, f"README legacy SDK boundary is missing: {contract}")
 
 
 def check_ci_baseline_docs():

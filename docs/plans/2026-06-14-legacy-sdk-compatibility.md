@@ -1,6 +1,6 @@
 # Legacy SDK Compatibility Boundary
 
-## Status: Planned
+## Status: Completed
 
 ## Context
 
@@ -27,10 +27,12 @@ map, or crash-reporting compatibility.
 
 ## Verification
 
-- repository and external-directory `make check`
-- hostile deployment-floor, Swift-era, vendored-SDK, live-API, credential,
-  documentation, and plan-status mutations
-- final artifact, credential, exact-diff, and hosted static audits
+- The repository and external-directory `make check` passed.
+- Seven hostile legacy SDK documentation mutations were rejected across the
+  deployment floor, Swift era, vendored SDK, live API, credential,
+  documentation, and plan status contracts.
+- Final artifact, credential, and exact-diff audits passed. Hosted static
+  verification remains the exact-head authority.
 
 ## Scope Boundary
 
