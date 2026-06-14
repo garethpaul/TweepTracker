@@ -57,6 +57,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - TwitterKit, Fabric, and Crashlytics are vendored historical binaries. The
   portable `make check` gate parses project resources and application
   contracts; it does not rebuild or execute those SDKs.
+- The historical Fabric upload shell phase was removed because it embedded
+  credentials in the Xcode project. The static gate rejects Fabric upload
+  commands and all PBX shell-script build phases.
 - Live Twitter login, Twitter API, map, and crash-reporting compatibility are
   not verified. Any manual experiment requires a compatible historical Apple
   toolchain, service availability, and local untracked credentials; none are
@@ -100,8 +103,12 @@ When the required SDK or runtime is unavailable, use static checks and source re
 
 - Detected references to Twitter. Keep API keys, OAuth credentials, tokens, and account-specific values in local configuration only.
 - The checked-in app plist must not contain Twitter/Fabric consumer secrets or
-  weaken App Transport Security. Profile-image requests and final responses
-  are accepted only over HTTPS.
+  weaken App Transport Security, and the Xcode project must not contain Fabric
+  upload credentials or shell-script build phases. Profile-image requests and
+  final responses are accepted only over HTTPS.
+- Removing a credential from the current tree does not revoke it or erase Git
+  history; service owners must revoke any historical credential that remains
+  valid.
 - Placemark fields and device coordinates must not be copied into diagnostic
   logs; map rendering continues to use guarded remote coordinate results.
 
@@ -157,6 +164,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   anchored Make verification under hostile root assignments.
 - See `docs/plans/2026-06-14-legacy-sdk-compatibility.md` for the checked-in
   iOS, Swift, vendored SDK, credential, and live API compatibility boundary.
+- See `docs/plans/2026-06-14-fabric-build-credential-removal.md` for the legacy
+  Fabric build-phase credential removal and static regression contract.
 
 ## Contributing
 

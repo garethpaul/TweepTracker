@@ -20,6 +20,7 @@ IMAGE_TASK_CANCELLATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-task-
 IMAGE_REQUEST_GENERATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-request-generation.md"
 ROOT_OVERRIDE_PLAN = ROOT / "docs/plans/2026-06-14-make-root-override-protection.md"
 LEGACY_SDK_PLAN = ROOT / "docs/plans/2026-06-14-legacy-sdk-compatibility.md"
+FABRIC_CREDENTIAL_PLAN = ROOT / "docs/plans/2026-06-14-fabric-build-credential-removal.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -56,6 +57,8 @@ def check_project_manifest_references():
 
     require("Storyboard.storyboard in Resources" in project, "main storyboard must remain bundled")
     require("location_trackerTests.swift in Sources" in project, "unit test source must remain compiled")
+    require("Fabric.framework/run" not in project, "project must not run Fabric with tracked credentials")
+    require("PBXShellScriptBuildPhase" not in project, "project must not contain shell-script build phases")
 
 
 def check_app_plist_contract():
@@ -138,6 +141,10 @@ def check_docs_plans():
     require(
         LEGACY_SDK_PLAN.exists(),
         "docs/plans/2026-06-14-legacy-sdk-compatibility.md is missing",
+    )
+    require(
+        FABRIC_CREDENTIAL_PLAN.exists(),
+        "docs/plans/2026-06-14-fabric-build-credential-removal.md is missing",
     )
 
     plans = sorted(plan_dir.glob("*.md"))

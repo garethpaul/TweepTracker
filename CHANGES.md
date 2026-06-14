@@ -2,6 +2,9 @@
 
 ## 2026-06-14
 
+- Removed a legacy Fabric upload shell phase that embedded credentials in the
+  Xcode project, and added static guards against Fabric commands and PBX shell
+  build phases returning.
 - Documented the legacy SDK compatibility boundary for the iOS 8.0/8.1
   project settings, Swift 2-era source, vendored Twitter/Fabric binaries,
   local-only credentials, and unverified live API behavior.

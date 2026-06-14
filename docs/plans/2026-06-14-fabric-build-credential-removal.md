@@ -1,10 +1,10 @@
 # Fabric Build Credential Removal
 
-## Status: In Progress
+## Status: Completed
 
 ## Context
 
-The application target contains a legacy Fabric upload shell build phase with
+The application target contained a legacy Fabric upload shell build phase with
 credentials embedded directly in `project.pbxproj`. This conflicts with the
 repository policy that Twitter and Fabric credentials remain local and
 untracked.
@@ -27,6 +27,18 @@ untracked.
   phase are rejected.
 - Audit the exact diff, generated artifacts, and changed lines for secrets.
 - Use the exact pushed head for hosted check and code-scanning evidence.
+
+## Verification
+
+- Repository and external-directory `make check` passed with eight static
+  project checks; iOS build and XCTest execution were skipped because this
+  Linux host does not provide `xcodebuild`.
+- Two isolated hostile mutations were rejected: one restored the Fabric upload
+  command and one restored the PBX shell-script build-phase marker.
+- Final current-tree credential, generated-artifact, changed-line secret,
+  whitespace, and exact-diff audits passed.
+- Hosted checks and code scanning remain the authority for the exact pushed
+  head.
 
 ## Scope Boundary
 
