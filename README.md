@@ -138,6 +138,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   annotation image reuse guards.
 - See `docs/plans/2026-06-12-location-log-privacy.md` for the removal of unused
   placemark and coordinate logging surfaces.
+- See `docs/plans/2026-06-14-make-root-override-protection.md` for repository-
+  anchored Make verification under hostile root assignments.
 
 ## Contributing
 

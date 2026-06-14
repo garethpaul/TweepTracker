@@ -1,6 +1,6 @@
 # Make Root Override Protection
 
-## Status: Planned
+## Status: Completed
 
 ## Context
 
@@ -71,12 +71,30 @@ This change does not modify Swift logic, image transport, task cancellation,
 request generations, map rendering, privacy behavior, project settings,
 workflow policy, dependencies, SDK versions, or deployment behavior.
 
-## Verification Plan
+## Work Completed
 
-- Run focused static contracts and Make dry-run checks.
-- Exercise all aliases from two working directories under hostile root
-  assignments while preserving explicit Python selection.
-- Reject eight focused structural and evidence mutations.
-- Run `make check` with an explicit timeout and document local Xcode availability.
-- Review the exact plan-scoped diff and audit generated artifacts, changed-line
-  secrets, whitespace, and protected Swift/project/workflow paths.
+- Protected the derived repository root with GNU Make's `override` directive
+  while preserving configurable Python selection.
+- Added declaration-count, ordering, alias, checker/Xcode-path, README, and plan
+  contracts to the canonical iOS checker.
+- Indexed the completed evidence without changing Swift, project, workflow,
+  privacy, networking, or map behavior.
+
+## Verification Results
+
+- All five public aliases passed dry-run verification from repository and
+  external working directories under hostile environment and command-line
+  `ROOT` assignments, for 20 bounded cases; explicit `PYTHON` overrides remained
+  effective.
+- Eight declaration protection, duplicate assignment, ordering, alias,
+  checker-path, README, missing-plan, and incomplete-plan mutations were
+  rejected.
+- The completed `make check` gate passed the full static project contract and
+  documented no-Xcode test/build paths from the repository and an external
+  working directory.
+- Hosted push and pull-request checks remain the exact-head branch authority.
+- Plan-aware correctness, build-integrity, iOS, privacy, testing,
+  maintainability, reliability, and project-standards review found no
+  actionable findings.
+- Exact diff, protected Swift/project/workflow/framework path,
+  generated-artifact, changed-line secret, and whitespace audits passed.

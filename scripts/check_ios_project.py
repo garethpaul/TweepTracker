@@ -18,6 +18,7 @@ LOCATION_LOG_PRIVACY_PLAN = ROOT / "docs/plans/2026-06-12-location-log-privacy.m
 URLSESSION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-urlsession.md"
 IMAGE_TASK_CANCELLATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-task-cancellation.md"
 IMAGE_REQUEST_GENERATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-request-generation.md"
+ROOT_OVERRIDE_PLAN = ROOT / "docs/plans/2026-06-14-make-root-override-protection.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -129,6 +130,10 @@ def check_docs_plans():
         IMAGE_REQUEST_GENERATION_PLAN.exists(),
         "docs/plans/2026-06-13-profile-image-request-generation.md is missing",
     )
+    require(
+        ROOT_OVERRIDE_PLAN.exists(),
+        "docs/plans/2026-06-14-make-root-override-protection.md is missing",
+    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -175,12 +180,31 @@ def check_ci_baseline_docs():
         require(re.fullmatch(r"[a-f0-9]{40}", revision), f"CI action {action} must be commit-pinned")
 
     makefile = read_text("Makefile")
+    root_declaration = "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))"
+    root_assignments = re.findall(
+        r"^(?:override\s+)?ROOT\s*[:+?]?=", makefile, re.MULTILINE
+    )
+    require(
+        len(root_assignments) == 1 and makefile.count(root_declaration) == 1,
+        "Makefile must contain exactly one protected repository-root declaration",
+    )
+    require(
+        makefile.count(f"{root_declaration}\nPYTHON ?= python3") == 1,
+        "Makefile must keep the protected root before the Python override",
+    )
     for contract in (
-        "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))",
+        ".PHONY: build check lint test verify",
+        "test: lint",
+        "verify: lint test build",
+        "check: verify",
         '$(PYTHON) "$(ROOT)/scripts/check_ios_project.py"',
         'cd "$(ROOT)" && xcodebuild',
     ):
         require(contract in makefile, f"Makefile must support invocation outside the repository: {contract}")
+    require(
+        "docs/plans/2026-06-14-make-root-override-protection.md" in read_text("README.md"),
+        "README.md must index Make root override protection evidence",
+    )
 
     docs = {
         "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],
