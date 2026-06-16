@@ -76,17 +76,14 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
 
                 }
                 else {
-                    println("Error: \(connectionError)")
                     completion(result: [])
                 }
         }
     }
     else {
-        println("Error: \(clientError)")
         completion(result: [])
     }
 
 
 
         }
-

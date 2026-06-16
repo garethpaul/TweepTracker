@@ -1,6 +1,6 @@
 # Runtime Error Log Privacy
 
-## Status: Planned
+## Status: Completed
 
 ## Priority
 
@@ -56,7 +56,19 @@ stops navigation.
 
 ## Verification
 
-Pending implementation and validation.
+- The focused Twitter guard checker passed with the seven raw SDK error prints
+  removed while existing empty fallback completions and the login-session guard
+  remained enforced.
+- Seven isolated raw-error-log mutations were rejected: both request error
+  variables in each list, timeline, and profile-image callback plus the login
+  authentication error.
+- Repository and external-directory `make check` passed with all eight portable
+  project contracts; iOS XCTest and build execution were skipped because this
+  Linux host does not provide `xcodebuild`.
+- Python syntax, exact diff, generated-artifact, credential-path, changed-line
+  secret, and whitespace audits passed before commit.
+- Hosted checks and security scanning remain the authority for the exact pushed
+  head.
 
 ## Scope Boundary
 

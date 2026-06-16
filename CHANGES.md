@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-16
+
+- Removed raw Twitter request and authentication error objects from runtime
+  logs while preserving existing fallback completions and failed-login guards;
+  added fail-closed runtime error log privacy contracts.
+
 ## 2026-06-14
 
 - Removed a legacy Fabric upload shell phase that embedded credentials in the

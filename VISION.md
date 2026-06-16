@@ -40,6 +40,8 @@ Priority:
 - Keep Twitter/Fabric credentials out of tracked plist files
 - Avoid hardcoded external upload paths for user coordinates
 - Keep placemark fields and device coordinates out of diagnostic logs
+- Keep runtime error log privacy explicit by excluding raw Twitter request and
+  authentication errors from diagnostic output
 - Keep GitHub Actions aligned with the local Python `make check` baseline
 - Keep the legacy SDK compatibility boundary explicit for iOS 8-era project
   settings, Swift 2-era source, vendored binaries, and unverified live APIs

@@ -111,6 +111,9 @@ When the required SDK or runtime is unavailable, use static checks and source re
   valid.
 - Placemark fields and device coordinates must not be copied into diagnostic
   logs; map rendering continues to use guarded remote coordinate results.
+- Runtime error log privacy keeps raw Twitter request and authentication errors
+  out of device and CI logs while preserving empty fallback completions and the
+  failed-login navigation guard.
 
 ## Security and Privacy Notes
 
@@ -166,6 +169,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   iOS, Swift, vendored SDK, credential, and live API compatibility boundary.
 - See `docs/plans/2026-06-14-fabric-build-credential-removal.md` for the legacy
   Fabric build-phase credential removal and static regression contract.
+- See `docs/plans/2026-06-16-runtime-error-log-privacy.md` for the raw Twitter
+  and authentication error-log removal and static regression contract.
 
 ## Contributing
 

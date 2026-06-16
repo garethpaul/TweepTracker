@@ -30,7 +30,6 @@ class LoginController: UIViewController {
             (session: TWTRSession!, error: NSError!) in
             // play with Twitter session
             if session == nil || error != nil {
-                println("Error: \(error)")
                 return
             }
 

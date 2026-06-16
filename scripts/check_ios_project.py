@@ -21,6 +21,7 @@ IMAGE_REQUEST_GENERATION_PLAN = ROOT / "docs/plans/2026-06-13-profile-image-requ
 ROOT_OVERRIDE_PLAN = ROOT / "docs/plans/2026-06-14-make-root-override-protection.md"
 LEGACY_SDK_PLAN = ROOT / "docs/plans/2026-06-14-legacy-sdk-compatibility.md"
 FABRIC_CREDENTIAL_PLAN = ROOT / "docs/plans/2026-06-14-fabric-build-credential-removal.md"
+RUNTIME_ERROR_LOG_PRIVACY_PLAN = ROOT / "docs/plans/2026-06-16-runtime-error-log-privacy.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -146,6 +147,10 @@ def check_docs_plans():
         FABRIC_CREDENTIAL_PLAN.exists(),
         "docs/plans/2026-06-14-fabric-build-credential-removal.md is missing",
     )
+    require(
+        RUNTIME_ERROR_LOG_PRIVACY_PLAN.exists(),
+        "docs/plans/2026-06-16-runtime-error-log-privacy.md is missing",
+    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -162,10 +167,24 @@ def check_docs_plans():
     ):
         require(evidence in legacy_plan, f"legacy SDK plan must record verification evidence: {evidence}")
 
+    runtime_error_plan = RUNTIME_ERROR_LOG_PRIVACY_PLAN.read_text(encoding="utf-8").lower()
+    for evidence in (
+        "repository and external-directory `make check` passed",
+        "seven isolated raw-error-log mutations were rejected",
+    ):
+        require(
+            evidence in runtime_error_plan,
+            f"runtime error log privacy plan must record verification evidence: {evidence}",
+        )
+
     for relative_path in ("README.md", "SECURITY.md", "VISION.md", "CHANGES.md"):
         require(
             "legacy sdk compatibility boundary" in read_text(relative_path).lower(),
             f"{relative_path} must document the legacy SDK compatibility boundary",
+        )
+        require(
+            "runtime error log privacy" in read_text(relative_path).lower(),
+            f"{relative_path} must document runtime error log privacy",
         )
 
     project = PROJECT_FILE.read_text(encoding="utf-8")
@@ -281,6 +300,23 @@ def check_twitter_json_guards():
     url_helper = read_text("location_tracker/URL.swift")
     app_delegate = read_text("location_tracker/AppDelegate.swift")
     login_controller = read_text("location_tracker/LoginController.swift")
+
+    raw_error_logs = {
+        "location_tracker/FindTweeps.swift": (find_tweeps, ("connectionError", "clientError")),
+        "location_tracker/TweepLocation.swift": (location, ("connectionError", "clientError")),
+        "location_tracker/TweepPicture.swift": (picture, ("connectionError", "clientError")),
+        "location_tracker/LoginController.swift": (login_controller, ("error",)),
+    }
+    for relative_path, (source, error_names) in raw_error_logs.items():
+        for error_name in error_names:
+            require(
+                re.search(
+                    rf"\b(?:print|println|NSLog)\s*\([^\n]*\b{error_name}\b",
+                    source,
+                )
+                is None,
+                f"{relative_path} must not write raw {error_name} details to logs",
+            )
 
     require(
         'json!["users"]' not in find_tweeps,
