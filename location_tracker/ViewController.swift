@@ -35,6 +35,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet var refresh: UIImageView!
     @IBOutlet var search: UIImageView!
 
+    var mapRefreshGeneration = 0
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -176,9 +178,21 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
 
     func setupMap(){
+        mapRefreshGeneration += 1
+        let refreshGeneration = mapRefreshGeneration
+
+        for existingAnnotation in mapView.annotations {
+            if !(existingAnnotation is MKUserLocation) {
+                if let annotationToRemove = existingAnnotation as? MKAnnotation {
+                    mapView.removeAnnotation(annotationToRemove)
+                }
+            }
+        }
+
         self.spinner.hidden = false
         self.spinner.startAnimating()
         self.mapView.hidden = true
+        self.refresh.hidden = true
 
         let location = CLLocationCoordinate2D(
             latitude: 51.48881507,
@@ -190,17 +204,24 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
 
         FindTweeps(){ (result: [String]) in
+            if self.mapRefreshGeneration != refreshGeneration {
+                return
+            }
+
             for u in result{
-                self.locateTweep(u)
+                self.locateTweep(u, refreshGeneration: refreshGeneration)
             }
 
 
 
             self.mapView.setRegion(region, animated: true)
-            self.refresh.hidden = true
             let mapDelay = 5 * Double(NSEC_PER_SEC)
             let mapTime = dispatch_time(DISPATCH_TIME_NOW, Int64(mapDelay))
             dispatch_after(mapTime, dispatch_get_main_queue()) {
+                if self.mapRefreshGeneration != refreshGeneration {
+                    return
+                }
+
                 self.spinner.stopAnimating()
                 self.mapView.hidden = false;
                 self.spinner.hidden = true;
@@ -208,6 +229,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 let refreshDelay = 60 * Double(NSEC_PER_SEC)
                 let refreshTime = dispatch_time(DISPATCH_TIME_NOW, Int64(refreshDelay))
                 dispatch_after(refreshTime, dispatch_get_main_queue()) {
+                    if self.mapRefreshGeneration != refreshGeneration {
+                        return
+                    }
+
                     //call the method which have the steps after delay.
                     self.displayRefresh()
                 }
@@ -221,8 +246,12 @@ class ViewController: UIViewController, MKMapViewDelegate {
         self.refresh.hidden = false
     }
 
-    func locateTweep(handle: String){
+    func locateTweep(handle: String, refreshGeneration: Int){
         TweepLocation(handle){ (result: [Double]) in
+            if self.mapRefreshGeneration != refreshGeneration {
+                return
+            }
+
             if result.count < 2 {
                 return
             }
@@ -234,6 +263,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
             // we need pictures then we are good
             TweepPicture(handle){ (result: String) in
+                if self.mapRefreshGeneration != refreshGeneration {
+                    return
+                }
+
                 var info2 = TweepAnnotation()
                 info2.setCoordinate(location2)
                 info2.title = "Info1"

@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-17
+
+- Added map refresh generation ownership so stale list, location, picture, and
+  delayed reveal callbacks cannot mutate the current annotations or loading UI;
+  new refreshes also clear prior non-user annotations before requesting data.
+
 ## 2026-06-16
 
 - Removed raw Twitter request and authentication error objects from runtime

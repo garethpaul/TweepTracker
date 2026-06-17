@@ -22,6 +22,7 @@ ROOT_OVERRIDE_PLAN = ROOT / "docs/plans/2026-06-14-make-root-override-protection
 LEGACY_SDK_PLAN = ROOT / "docs/plans/2026-06-14-legacy-sdk-compatibility.md"
 FABRIC_CREDENTIAL_PLAN = ROOT / "docs/plans/2026-06-14-fabric-build-credential-removal.md"
 RUNTIME_ERROR_LOG_PRIVACY_PLAN = ROOT / "docs/plans/2026-06-16-runtime-error-log-privacy.md"
+MAP_REFRESH_GENERATION_PLAN = ROOT / "docs/plans/2026-06-17-map-refresh-request-generation.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -151,6 +152,10 @@ def check_docs_plans():
         RUNTIME_ERROR_LOG_PRIVACY_PLAN.exists(),
         "docs/plans/2026-06-16-runtime-error-log-privacy.md is missing",
     )
+    require(
+        MAP_REFRESH_GENERATION_PLAN.exists(),
+        "docs/plans/2026-06-17-map-refresh-request-generation.md is missing",
+    )
 
     plans = sorted(plan_dir.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
@@ -177,6 +182,16 @@ def check_docs_plans():
             f"runtime error log privacy plan must record verification evidence: {evidence}",
         )
 
+    map_refresh_plan = MAP_REFRESH_GENERATION_PLAN.read_text(encoding="utf-8").lower()
+    for evidence in (
+        "repository and external-directory `make check` passed",
+        "ten isolated map-refresh-generation mutations were rejected",
+    ):
+        require(
+            evidence in map_refresh_plan,
+            f"map refresh generation plan must record verification evidence: {evidence}",
+        )
+
     for relative_path in ("README.md", "SECURITY.md", "VISION.md", "CHANGES.md"):
         require(
             "legacy sdk compatibility boundary" in read_text(relative_path).lower(),
@@ -185,6 +200,10 @@ def check_docs_plans():
         require(
             "runtime error log privacy" in read_text(relative_path).lower(),
             f"{relative_path} must document runtime error log privacy",
+        )
+        require(
+            "map refresh generation" in read_text(relative_path).lower(),
+            f"{relative_path} must document map refresh generation ownership",
         )
 
     project = PROJECT_FILE.read_text(encoding="utf-8")
@@ -441,6 +460,33 @@ def check_twitter_json_guards():
     require(
         "dispatch_after(mapTime, dispatch_get_main_queue())" in view_controller,
         "map setup must reveal the map asynchronously on the main queue",
+    )
+    for contract in (
+        "var mapRefreshGeneration = 0",
+        "mapRefreshGeneration += 1",
+        "let refreshGeneration = mapRefreshGeneration",
+        "for existingAnnotation in mapView.annotations",
+        "if !(existingAnnotation is MKUserLocation)",
+        "mapView.removeAnnotation(annotationToRemove)",
+        "self.locateTweep(u, refreshGeneration: refreshGeneration)",
+        "func locateTweep(handle: String, refreshGeneration: Int)",
+    ):
+        require(contract in view_controller, f"map refresh generation guard is missing: {contract}")
+    require(
+        view_controller.count("if self.mapRefreshGeneration != refreshGeneration") == 5,
+        "list, location, picture, reveal, and refresh callbacks must reject stale generations",
+    )
+    require(
+        view_controller.index("mapRefreshGeneration += 1")
+        < view_controller.index("let refreshGeneration = mapRefreshGeneration")
+        < view_controller.index("for existingAnnotation in mapView.annotations")
+        < view_controller.index("self.refresh.hidden = true")
+        < view_controller.index("FindTweeps()"),
+        "map refresh ownership, annotation cleanup, and UI gating must precede asynchronous work",
+    )
+    require(
+        view_controller.count("self.refresh.hidden = true") == 1,
+        "refresh control must be hidden once at refresh start",
     )
     require(
         "func downloadImage(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void)) -> NSURLSessionDataTask?" in url_helper,

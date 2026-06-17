@@ -49,6 +49,9 @@ Helpful reports include:
 - Runtime error log privacy requires Twitter request, SDK, and authentication
   failures to use existing fallback behavior without interpolating raw error
   objects into device or CI logs.
+- Map refresh generation ownership requires list, location, picture, and
+  delayed reveal callbacks to match the controller's current refresh before
+  mutating annotations or loading UI state.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - Review found database, model, query, or persistence-related code; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.

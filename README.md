@@ -89,6 +89,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   requesting Tweep. Per-pin request generations keep late cancelled callbacks
   from releasing newer tasks, while matching completions release their task
   ownership before handling an image or error.
+- A map refresh generation owns each list, location, picture, and delayed UI
+  callback so an older refresh cannot repopulate or reveal the map after a
+  newer refresh has started.
 - Static checks also require completed canonical plans under `docs/plans`.
 - GitHub Actions installs Python 3.12 and runs `make check` for all branch
   pushes, pull requests, and manual runs with read-only repository permissions,
@@ -171,6 +174,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   Fabric build-phase credential removal and static regression contract.
 - See `docs/plans/2026-06-16-runtime-error-log-privacy.md` for the raw Twitter
   and authentication error-log removal and static regression contract.
+- See `docs/plans/2026-06-17-map-refresh-request-generation.md` for map refresh
+  generation ownership and stale callback rejection.
 
 ## Contributing
 
