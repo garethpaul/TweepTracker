@@ -32,6 +32,11 @@ Priority:
   returned
 - Keep profile image downloads HTTPS-only, bounded, and off the main operation
   queue
+- Stream profile images through an incremental size boundary and establish pin
+  task ownership before network work starts
+- Reject Boolean, non-finite, and out-of-range public tweet coordinates and
+  reduce displayed location precision without requesting device authorization
+- Validate Twitter response transport metadata before JSON parsing
 - Keep profile image transport on the session-based networking API
 - Cancel obsolete profile image tasks when map pins are reused
 - Release completed profile image tasks without letting stale callbacks clear

@@ -59,6 +59,7 @@ def check_project_manifest_references():
 
     require("Storyboard.storyboard in Resources" in project, "main storyboard must remain bundled")
     require("location_trackerTests.swift in Sources" in project, "unit test source must remain compiled")
+    require("TwitterResponse.swift in Sources" in project, "Twitter response validator must be compiled")
     require("Fabric.framework/run" not in project, "project must not run Fabric with tracked credentials")
     require("PBXShellScriptBuildPhase" not in project, "project must not contain shell-script build phases")
 
@@ -310,6 +311,13 @@ def check_ci_baseline_docs():
         for phrase in required_phrases:
             require(phrase in text, f"{relative_path} must document {phrase}")
 
+    makefile = read_text("Makefile")
+    require("RUN_LEGACY_XCODE ?= 0" in makefile, "legacy Xcode execution must default off")
+    require(
+        makefile.count('[ "$(RUN_LEGACY_XCODE)" = "1" ] && command -v xcodebuild') == 2,
+        "native test and build gates must require explicit legacy Xcode opt-in",
+    )
+
 
 def check_twitter_json_guards():
     find_tweeps = read_text("location_tracker/FindTweeps.swift")
@@ -317,8 +325,15 @@ def check_twitter_json_guards():
     picture = read_text("location_tracker/TweepPicture.swift")
     view_controller = read_text("location_tracker/ViewController.swift")
     url_helper = read_text("location_tracker/URL.swift")
+    twitter_response = read_text("location_tracker/TwitterResponse.swift")
     app_delegate = read_text("location_tracker/AppDelegate.swift")
     login_controller = read_text("location_tracker/LoginController.swift")
+    twitter_header = read_text("TwitterKit.framework/Versions/A/Headers/TWTRAPIClient.h")
+
+    require(
+        "Called on main queue." in twitter_header,
+        "vendored Twitter request callbacks must retain their documented main-queue contract",
+    )
 
     raw_error_logs = {
         "location_tracker/FindTweeps.swift": (find_tweeps, ("connectionError", "clientError")),
@@ -336,6 +351,30 @@ def check_twitter_json_guards():
                 is None,
                 f"{relative_path} must not write raw {error_name} details to logs",
             )
+
+    for relative_path, source in (
+        ("location_tracker/FindTweeps.swift", find_tweeps),
+        ("location_tracker/TweepLocation.swift", location),
+        ("location_tracker/TweepPicture.swift", picture),
+    ):
+        require(
+            "ValidatedTwitterResponseData(response, data: data, error: connectionError)" in source,
+            f"{relative_path} must validate Twitter response metadata before JSON parsing",
+        )
+        require(
+            "JSONObjectWithData(responseData" in source,
+            f"{relative_path} must parse only validated Twitter response data",
+        )
+    for contract in (
+        'response?.URL?.scheme?.lowercaseString != "https"',
+        "response as? NSHTTPURLResponse",
+        "httpResponse!.statusCode < 200",
+        "httpResponse!.statusCode >= 300",
+        'mimeType != "application/json"',
+        "expectedContentLength > Int64(maximumTwitterResponseBytes)",
+        "data.length > maximumTwitterResponseBytes",
+    ):
+        require(contract in twitter_response, f"Twitter response guard is missing: {contract}")
 
     require(
         'json!["users"]' not in find_tweeps,
@@ -359,21 +398,28 @@ def check_twitter_json_guards():
         "coordinate JSON must verify latitude and longitude are present",
     )
     require(
-        "if let lat = coordinates[1] as? NSNumber" in location,
-        "coordinate JSON must verify latitude values are numeric",
+        "NormalizedTweepCoordinate(coordinates[1], minimum: -90, maximum: 90)" in location,
+        "coordinate JSON must validate, bound, and reduce latitude precision",
     )
     require(
-        "if let lng = coordinates[0] as? NSNumber" in location,
-        "coordinate JSON must verify longitude values are numeric",
+        "NormalizedTweepCoordinate(coordinates[0], minimum: -180, maximum: 180)" in location,
+        "coordinate JSON must validate, bound, and reduce longitude precision",
     )
     require(
         "var coordinateResult = Array<Double>()" in location,
         "timeline coordinate lookup must keep an empty fallback result",
     )
     require(
-        "coordinateResult = [lat.doubleValue, lng.doubleValue]" in location,
+        "coordinateResult = [lat, lng]" in location,
         "timeline coordinate lookup must store normalized coordinates before completion",
     )
+    for contract in (
+        "CFGetTypeID(number) == CFBooleanGetTypeID()",
+        "isfinite(coordinate) == 0",
+        "coordinate < minimum || coordinate > maximum",
+        "round(coordinate * tweepCoordinatePrecision) / tweepCoordinatePrecision",
+    ):
+        require(contract in location, f"coordinate privacy guard is missing: {contract}")
     require(
         "completion(result: coordinateResult)" in location,
         "timeline coordinate lookup must complete after parsing succeeds or finds no coordinates",
@@ -470,6 +516,8 @@ def check_twitter_json_guards():
         "mapView.removeAnnotation(annotationToRemove)",
         "self.locateTweep(u, refreshGeneration: refreshGeneration)",
         "func locateTweep(handle: String, refreshGeneration: Int)",
+        "if let pinView = mapView.viewForAnnotation(existingAnnotation) as? TweepPinAnnotationView",
+        "pinView.cancelImageRequest()",
     ):
         require(contract in view_controller, f"map refresh generation guard is missing: {contract}")
     require(
@@ -498,7 +546,9 @@ def check_twitter_json_guards():
         "var imageRequestGeneration = 0",
         "func cancelImageRequest()",
         "override func prepareForReuse()",
-        "pinView!.imageTask = url.downloadImage",
+        "let imageTask = url.downloadImage",
+        "pinView!.imageTask = imageTask",
+        "imageTask?.resume()",
     ):
         require(contract in view_controller + url_helper, f"profile image cancellation guard is missing: {contract}")
     cancel_image_request = re.search(
@@ -557,12 +607,12 @@ def check_twitter_json_guards():
     request_start = re.search(
         r"pinView!\.imageRequestGeneration \+= 1\s+"
         r"let imageRequestGeneration = pinView!\.imageRequestGeneration\s+"
-        r"pinView!\.imageTask = url\.downloadImage",
+        r"let imageTask = url\.downloadImage",
         view_controller,
     )
     require(request_start is not None, "profile image requests must capture a new generation")
     completion = re.search(
-        r"pinView!\.imageTask = url\.downloadImage\(imageURL, \{image, error in"
+        r"let imageTask = url\.downloadImage\(imageURL, \{image, error in"
         r"(?P<body>.*?)\n                    \}\)",
         view_controller,
         re.DOTALL,
@@ -586,6 +636,11 @@ def check_twitter_json_guards():
         < completion_body.index("currentPinView.image = circle"),
         "matching completion must release ownership before annotation-checked rendering",
     )
+    require(
+        view_controller.index("pinView!.imageTask = imageTask")
+        < view_controller.index("imageTask?.resume()"),
+        "pin must own the suspended image task before it starts",
+    )
     for path, fragment in (
         ("README.md", "Per-pin request generations keep late cancelled callbacks"),
         ("SECURITY.md", "match the pin's active request generation"),
@@ -594,17 +649,14 @@ def check_twitter_json_guards():
     ):
         require(fragment in read_text(path), f"{path} must document image request generation guards")
     require(url_helper.count("return nil") == 1, "HTTPS rejection must return one nil task")
-    require(url_helper.count("return task") == 1, "downloadImage must return its one resumed task")
+    require(url_helper.count("return task") == 2, "image transport must return one created and one exposed task")
     require(
         url_helper.index('url.scheme?.lowercaseString != "https"')
         < url_helper.index("return nil")
         < url_helper.index("let imageRequest"),
         "non-HTTPS image URLs must return nil before request creation",
     )
-    require(
-        url_helper.index("task.resume()") < url_helper.index("return task"),
-        "downloadImage must resume the task before returning it",
-    )
+    require("task.resume()" not in url_helper, "downloadImage must return a suspended task for ownership")
     require(
         "UIImage(data: data)!" not in url_helper,
         "downloadImage must not force-unwrap decoded image data",
@@ -615,18 +667,20 @@ def check_twitter_json_guards():
     )
     for contract in (
         'url.scheme?.lowercaseString != "https"',
-        'response?.URL?.scheme?.lowercaseString != "https"',
+        'response.URL?.scheme?.lowercaseString != "https"',
         "maximumImageBytes = 5 * 1024 * 1024",
         "cachePolicy: .ReturnCacheDataElseLoad",
         "timeoutInterval: 15",
-        "NSURLSession.sharedSession()",
+        "NSURLSessionDataDelegate",
+        "let createdSession = NSURLSession(",
         "dataTaskWithRequest(",
-        "task.resume()",
         "response as? NSHTTPURLResponse",
         "httpResponse!.statusCode < 200",
         "httpResponse!.statusCode >= 300",
         'mimeType?.hasPrefix("image/") != true',
-        "data.length > self.maximumImageBytes",
+        "response.expectedContentLength > Int64(maximumImageBytes)",
+        "receivedData.length + data.length > maximumImageBytes",
+        "dataTask.cancel()",
         "dispatch_async(dispatch_get_main_queue())",
         'downloadError(3, description: "Profile image could not be decoded")',
     ):
@@ -636,8 +690,8 @@ def check_twitter_json_guards():
         "profile image transport must not restore deprecated NSURLConnection",
     )
     require(
-        url_helper.count("dispatch_async(dispatch_get_main_queue())") == 3,
-        "every profile image completion path must return on the main queue",
+        url_helper.count("dispatch_async(dispatch_get_main_queue())") == 2,
+        "profile image rejection and completion must return on the main queue",
     )
     require(
         "queue: NSOperationQueue.mainQueue()" not in url_helper,
@@ -669,6 +723,13 @@ def check_twitter_json_guards():
 def check_location_log_privacy():
     app_delegate = read_text("location_tracker/AppDelegate.swift")
     view_controller = read_text("location_tracker/ViewController.swift")
+    info_plist = read_text("location_tracker/Info.plist")
+
+    require("NSLocation" not in info_plist, "app must not declare unused location permission keys")
+    require(
+        "CLLocationManager" not in app_delegate + view_controller,
+        "app must not instantiate a device location manager",
+    )
 
     for fragment in (
         "func displayLocationInfo",

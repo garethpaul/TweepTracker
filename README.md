@@ -70,20 +70,24 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 ## Running or Using the Project
 
 - Open `location_tracker.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
-- Run `make check` for static project and Twitter JSON guard checks. The Xcode
-  test and build steps run only on hosts where `xcodebuild` is installed.
+- Run `make check` for portable static, contract, and mutation verification.
+  Run `RUN_LEGACY_XCODE=1 make check` only with a compatible historical Xcode;
+  merely having a current `xcodebuild` installed does not make the Swift 2-era
+  targets buildable.
 
 ## Testing and Verification
 
 - `make check` runs plist, storyboard, asset, Xcode project, Twitter JSON
-  parsing, HTTPS-only bounded profile-image loading, map coordinate order, Twitter login
+  parsing, HTTPS-only streaming profile-image loading, map coordinate order, Twitter login
   navigation, non-blocking map reveal timing, and no external coordinate upload
   contract checks. Static checks also require Twitter list-member request
   failures, timeline coordinate lookup failures, and profile-image lookup
   failures to complete with empty results so the map setup path can finish.
-  Timeline coordinate checks require latitude and longitude JSON values to be
-  numeric before map annotations are created. Unused placemark and coordinate
-  logging surfaces are also prohibited.
+  Timeline coordinate checks reject Boolean, non-finite, and out-of-range JSON
+  values, then reduce accepted public tweet coordinates to two decimal places
+  before map annotations are created. The app does not request device-location
+  authorization. Unused placemark and coordinate logging surfaces are also
+  prohibited.
 - Reused map annotation views cancel obsolete profile-image tasks, clear stale
   avatars, and only accept an async image when they still represent the
   requesting Tweep. Per-pin request generations keep late cancelled callbacks
@@ -92,6 +96,12 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - A map refresh generation owns each list, location, picture, and delayed UI
   callback so an older refresh cannot repopulate or reveal the map after a
   newer refresh has started.
+- Remote images stream through a bounded `NSURLSessionDataDelegate`; oversized
+  declared or received bodies are cancelled before decode. Pins own suspended
+  tasks before resuming them, and refresh removes annotations only after
+  cancelling visible image work.
+- Twitter API JSON is parsed only after validating final HTTPS transport, 2xx
+  status, JSON MIME type, and declared and received response sizes.
 - Static checks also require completed canonical plans under `docs/plans`.
 - GitHub Actions installs Python 3.12 and runs `make check` for all branch
   pushes, pull requests, and manual runs with read-only repository permissions,

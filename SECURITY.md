@@ -36,9 +36,9 @@ Helpful reports include:
   Fabric, and Crashlytics binaries as historical artifacts; live use requires
   local untracked credentials and is not covered by portable verification.
 - The historical Fabric upload build phase has been removed from the current
-  tree. Removing it does not revoke the exposed credential or erase Git
-  history; service owners must revoke any historical credential that remains
-  valid.
+  tree. Removing it does not revoke or erase the two values retained in Git
+  history; service owners must revoke both historical Fabric credentials at
+  the provider, review provider activity, or delete the retired Fabric app.
 - Remote profile-image requests and final responses must use HTTPS and pass
   status, image MIME type, size, and decode validation before display.
 - Reused map pins must cancel obsolete profile-image tasks before accepting a
@@ -52,6 +52,9 @@ Helpful reports include:
 - Map refresh generation ownership requires list, location, picture, and
   delayed reveal callbacks to match the controller's current refresh before
   mutating annotations or loading UI state.
+- Twitter timeline coordinates must reject Boolean, non-finite, and
+  out-of-range values, then reduce accepted coordinates to two decimal places
+  before map display. The app must not request device-location authorization.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - Review found database, model, query, or persistence-related code; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.

@@ -1,5 +1,21 @@
 # Changes
 
+## 2026-06-19
+
+- Validated Twitter API responses for HTTPS, 2xx status, JSON content type,
+  declared size, and received size before parsing.
+- Rejected Boolean, non-finite, and out-of-range tweet coordinates and reduced
+  displayed coordinate precision to two decimal places.
+- Replaced completion-handler image buffering with a streaming data delegate
+  that cancels responses exceeding the five-megabyte limit.
+- Assigned suspended avatar tasks to their pin before resuming them and
+  cancelled visible pin tasks before refresh-time annotation removal.
+- Confirmed the app declares no device-location permission and documented that
+  both historically exposed Fabric credentials require provider-side
+  revocation or retirement.
+- Made archival Xcode execution an explicit `RUN_LEGACY_XCODE=1` opt-in so the
+  default `make check` remains portable on modern macOS hosts.
+
 ## 2026-06-17
 
 - Added map refresh generation ownership so stale list, location, picture, and

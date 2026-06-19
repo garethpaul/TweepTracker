@@ -147,7 +147,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 if let imageURL = NSURL(string: url_string) {
                     pinView!.imageRequestGeneration += 1
                     let imageRequestGeneration = pinView!.imageRequestGeneration
-                    pinView!.imageTask = url.downloadImage(imageURL, {image, error in
+                    let imageTask = url.downloadImage(imageURL, {image, error in
                         if let currentPinView = pinView {
                             if currentPinView.imageRequestGeneration == imageRequestGeneration {
                                 currentPinView.imageTask = nil
@@ -162,6 +162,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
                             }
                         }
                     })
+                    pinView!.imageTask = imageTask
+                    imageTask?.resume()
                 }
             }
 
@@ -183,6 +185,9 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
         for existingAnnotation in mapView.annotations {
             if !(existingAnnotation is MKUserLocation) {
+                if let pinView = mapView.viewForAnnotation(existingAnnotation) as? TweepPinAnnotationView {
+                    pinView.cancelImageRequest()
+                }
                 if let annotationToRemove = existingAnnotation as? MKAnnotation {
                     mapView.removeAnnotation(annotationToRemove)
                 }
