@@ -12,7 +12,7 @@ Transport Security exceptions.
 
 ## Objectives
 
-- Accept remote profile images only over HTTPS.
+- Accept remote profile-image requests and final responses only over HTTPS.
 - Bound request duration and response size.
 - Require a successful HTTP status and image MIME type before decoding.
 - Keep network and decode work off the main operation queue while delivering UI
@@ -22,8 +22,8 @@ Transport Security exceptions.
 
 ## Work Completed
 
-- Added HTTPS, 2xx status, image MIME, five-megabyte, timeout, and decode guards
-  to `URL.downloadImage`.
+- Added request and final-response HTTPS, 2xx status, image MIME,
+  five-megabyte, timeout, and decode guards to `URL.downloadImage`.
 - Moved image request/decode work to a background operation queue and dispatches
   every completion back to the main queue.
 - Extended plist, source, workflow, action annotation, and Makefile contracts.

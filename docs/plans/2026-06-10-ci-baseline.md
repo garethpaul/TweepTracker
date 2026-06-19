@@ -19,9 +19,10 @@ the portable contracts are the appropriate hosted verification surface.
 
 ## Work Completed
 
-- Added `.github/workflows/check.yml` for pushes to `master`, pull requests,
-  and manual runs.
-- Granted only read access to repository contents and set a five-minute timeout.
+- Added `.github/workflows/check.yml` for all branch pushes, pull requests, and
+  manual runs.
+- Granted only read access to repository contents, disabled persisted checkout
+  credentials, and set a five-minute timeout.
 - Pinned checkout and Python setup actions to immutable Node 24 commits.
 - Ran the existing `make check` entry point with Python 3.12.
 - Extended `scripts/check_ios_project.py` to enforce workflow triggers,

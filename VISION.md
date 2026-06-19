@@ -32,15 +32,30 @@ Priority:
   returned
 - Keep profile image downloads HTTPS-only, bounded, and off the main operation
   queue
+- Stream profile images through an incremental size boundary and establish pin
+  task ownership before network work starts
+- Reject Boolean, non-finite, and out-of-range public tweet coordinates and
+  reduce displayed location precision without requesting device authorization
+- Validate Twitter response transport metadata before JSON parsing
+- Keep profile image transport on the session-based networking API
+- Cancel obsolete profile image tasks when map pins are reused
+- Release completed profile image tasks without letting stale callbacks clear
+  newer per-pin work
 - Prevent reused map pins from displaying another Tweep's delayed avatar
 - Keep Twitter/Fabric credentials out of tracked plist files
 - Avoid hardcoded external upload paths for user coordinates
+- Keep placemark fields and device coordinates out of diagnostic logs
+- Keep runtime error log privacy explicit by excluding raw Twitter request and
+  authentication errors from diagnostic output
+- Keep map refresh generation ownership explicit so stale asynchronous results
+  cannot replace current annotations or loading UI state
 - Keep GitHub Actions aligned with the local Python `make check` baseline
+- Keep the legacy SDK compatibility boundary explicit for iOS 8-era project
+  settings, Swift 2-era source, vendored binaries, and unverified live APIs
 
 Next priorities:
 
-- Add setup notes for legacy SDK requirements and current API limitations
-- Add privacy notes for geolocation and profile images
+- Add consent-oriented runtime UX before any future live geolocation feature
 - Replace hardcoded supplemental handles with configurable demo data
 - Modernize Swift only in a dedicated pass
 

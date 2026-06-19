@@ -1,5 +1,61 @@
 # Changes
 
+## 2026-06-19
+
+- Validated Twitter API responses for HTTPS, 2xx status, JSON content type,
+  declared size, and received size before parsing.
+- Rejected Boolean, non-finite, and out-of-range tweet coordinates and reduced
+  displayed coordinate precision to two decimal places.
+- Replaced completion-handler image buffering with a streaming data delegate
+  that cancels responses exceeding the five-megabyte limit.
+- Assigned suspended avatar tasks to their pin before resuming them and
+  cancelled visible pin tasks before refresh-time annotation removal.
+- Confirmed the app declares no device-location permission and documented that
+  both historically exposed Fabric credentials require provider-side
+  revocation or retirement.
+- Made archival Xcode execution an explicit `RUN_LEGACY_XCODE=1` opt-in so the
+  default `make check` remains portable on modern macOS hosts.
+
+## 2026-06-17
+
+- Added map refresh generation ownership so stale list, location, picture, and
+  delayed reveal callbacks cannot mutate the current annotations or loading UI;
+  new refreshes also clear prior non-user annotations before requesting data.
+
+## 2026-06-16
+
+- Removed raw Twitter request and authentication error objects from runtime
+  logs while preserving existing fallback completions and failed-login guards;
+  added fail-closed runtime error log privacy contracts.
+
+## 2026-06-14
+
+- Removed a legacy Fabric upload shell phase that embedded credentials in the
+  Xcode project, and added static guards against Fabric commands and PBX shell
+  build phases returning.
+- Documented the legacy SDK compatibility boundary for the iOS 8.0/8.1
+  project settings, Swift 2-era source, vendored Twitter/Fabric binaries,
+  local-only credentials, and unverified live API behavior.
+
+## 2026-06-13
+
+- Added per-pin request generations so matching profile-image completions
+  release task ownership while stale callbacks cannot clear newer work.
+- Added per-pin URLSession task ownership and cancellation so reused annotation
+  views stop obsolete profile-image network and decode work.
+- Replaced deprecated asynchronous `NSURLConnection` profile-image loading with
+  an explicitly resumed `NSURLSession` data task while retaining all transport
+  and callback safeguards.
+
+## 2026-06-12
+
+- Removed an unused placemark helper that logged locality, postal code,
+  administrative area, and country.
+- Removed a dormant AppDelegate location callback and commented coordinate
+  logging examples.
+- Added static privacy contracts preventing both location-log surfaces from
+  returning.
+
 ## 2026-06-10
 
 - Guarded asynchronous avatar assignment against map annotation reuse and
@@ -12,7 +68,8 @@
 - Fixed the CI runner to Ubuntu 24.04, annotated immutable action revisions,
   scoped concurrency, and made Make targets independent of the caller's path.
 - Added a least-privilege GitHub Actions workflow that runs `make check` with
-  commit-pinned Node 24 actions and a bounded runtime.
+  commit-pinned Node 24 actions, credential-free checkout, all-branch push
+  coverage, and a bounded runtime.
 - Extended the static project checker and docs to require the hosted CI
   verification path.
 

@@ -38,10 +38,9 @@ func FindTweeps(completion: (result: [String]) -> Void) {
         Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
             (response, data, connectionError) -> Void in
 
-            // If there are no errors
-            if (connectionError == nil) {
+            if let responseData = ValidatedTwitterResponseData(response, data: data, error: connectionError) {
                 var jsonError : NSError?
-                let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError)
+                let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(responseData, options: nil, error: &jsonError)
 
                 // userArray this is how we store all the users to send back to the ViewController.
                 var userArray = Array<String>()
@@ -75,18 +74,14 @@ func FindTweeps(completion: (result: [String]) -> Void) {
             }
 
             else {
-                println("Error: \(connectionError)")
                 completion(result: [])
             }
         }
     }
     else {
-        println("Error: \(clientError)")
         completion(result: [])
     }
 
 }
-
-
 
 

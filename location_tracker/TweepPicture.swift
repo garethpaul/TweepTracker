@@ -32,12 +32,12 @@ func TweepPicture(handle: String, completion: (result: String) -> Void) {
         // Send Request to Twitter REST Api.
         Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
             (response, data, connectionError) -> Void in
-            if (connectionError == nil) {
+            if let responseData = ValidatedTwitterResponseData(response, data: data, error: connectionError) {
                 var jsonError : NSError?
                 var profileImageURL = ""
 
                 // Setup json to contain the JSON object returned by the API
-                let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError)
+                let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(responseData, options: nil, error: &jsonError)
 
                 // find the profile image from the json object e.g. {"profile_image_url": ...}
                 if let jsonObject = json as? JSONDictionary {
@@ -51,13 +51,11 @@ func TweepPicture(handle: String, completion: (result: String) -> Void) {
             }
 
             else {
-                println("Error: \(connectionError)")
                 completion(result: "")
             }
         }
     }
     else {
-        println("Error: \(clientError)")
         completion(result: "")
     }
 

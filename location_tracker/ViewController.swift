@@ -7,6 +7,23 @@ import CoreLocation
 import MapKit
 import TwitterKit
 
+private class TweepPinAnnotationView: MKPinAnnotationView {
+    var imageTask: NSURLSessionDataTask?
+    var imageRequestGeneration = 0
+
+    func cancelImageRequest() {
+        imageRequestGeneration += 1
+        imageTask?.cancel()
+        imageTask = nil
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        cancelImageRequest()
+        image = nil
+    }
+}
+
 class ViewController: UIViewController, MKMapViewDelegate {
 
     var logoView: UIImageView!
@@ -17,6 +34,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
     @IBOutlet var refresh: UIImageView!
     @IBOutlet var search: UIImageView!
+
+    var mapRefreshGeneration = 0
 
 
     override func viewDidLoad() {
@@ -111,11 +130,12 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
             let reuseId = "pin"
 
-            var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
+            var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? TweepPinAnnotationView
             if pinView == nil {
-                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+                pinView = TweepPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             }
             else {
+                pinView!.cancelImageRequest()
                 pinView!.annotation = annotation
             }
 
@@ -125,16 +145,25 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 let url = URL()
                 let url_string = tweep.imageURL
                 if let imageURL = NSURL(string: url_string) {
-                    url.downloadImage(imageURL, {image, error in
-                        if let newImg = image {
-                            if let currentAnnotation = pinView?.annotation {
-                                if currentAnnotation === annotation {
-                                    let circle = CircleImage(RBResizeImage(newImg, CGSize(width: 50, height: 50)))
-                                    pinView!.image = circle
+                    pinView!.imageRequestGeneration += 1
+                    let imageRequestGeneration = pinView!.imageRequestGeneration
+                    let imageTask = url.downloadImage(imageURL, {image, error in
+                        if let currentPinView = pinView {
+                            if currentPinView.imageRequestGeneration == imageRequestGeneration {
+                                currentPinView.imageTask = nil
+                                if let currentAnnotation = currentPinView.annotation {
+                                    if currentAnnotation === annotation {
+                                        if let newImg = image {
+                                            let circle = CircleImage(RBResizeImage(newImg, CGSize(width: 50, height: 50)))
+                                            currentPinView.image = circle
+                                        }
+                                    }
                                 }
                             }
                         }
                     })
+                    pinView!.imageTask = imageTask
+                    imageTask?.resume()
                 }
             }
 
@@ -151,9 +180,24 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
 
     func setupMap(){
+        mapRefreshGeneration += 1
+        let refreshGeneration = mapRefreshGeneration
+
+        for existingAnnotation in mapView.annotations {
+            if !(existingAnnotation is MKUserLocation) {
+                if let pinView = mapView.viewForAnnotation(existingAnnotation) as? TweepPinAnnotationView {
+                    pinView.cancelImageRequest()
+                }
+                if let annotationToRemove = existingAnnotation as? MKAnnotation {
+                    mapView.removeAnnotation(annotationToRemove)
+                }
+            }
+        }
+
         self.spinner.hidden = false
         self.spinner.startAnimating()
         self.mapView.hidden = true
+        self.refresh.hidden = true
 
         let location = CLLocationCoordinate2D(
             latitude: 51.48881507,
@@ -165,17 +209,24 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
 
         FindTweeps(){ (result: [String]) in
+            if self.mapRefreshGeneration != refreshGeneration {
+                return
+            }
+
             for u in result{
-                self.locateTweep(u)
+                self.locateTweep(u, refreshGeneration: refreshGeneration)
             }
 
 
 
             self.mapView.setRegion(region, animated: true)
-            self.refresh.hidden = true
             let mapDelay = 5 * Double(NSEC_PER_SEC)
             let mapTime = dispatch_time(DISPATCH_TIME_NOW, Int64(mapDelay))
             dispatch_after(mapTime, dispatch_get_main_queue()) {
+                if self.mapRefreshGeneration != refreshGeneration {
+                    return
+                }
+
                 self.spinner.stopAnimating()
                 self.mapView.hidden = false;
                 self.spinner.hidden = true;
@@ -183,6 +234,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 let refreshDelay = 60 * Double(NSEC_PER_SEC)
                 let refreshTime = dispatch_time(DISPATCH_TIME_NOW, Int64(refreshDelay))
                 dispatch_after(refreshTime, dispatch_get_main_queue()) {
+                    if self.mapRefreshGeneration != refreshGeneration {
+                        return
+                    }
+
                     //call the method which have the steps after delay.
                     self.displayRefresh()
                 }
@@ -196,23 +251,12 @@ class ViewController: UIViewController, MKMapViewDelegate {
         self.refresh.hidden = false
     }
 
-
-    func displayLocationInfo(placemark: CLPlacemark?) {
-        if let containsPlacemark = placemark {
-            //stop updating location to save battery life
-            let locality = (containsPlacemark.locality != nil) ? containsPlacemark.locality : ""
-            let postalCode = (containsPlacemark.postalCode != nil) ? containsPlacemark.postalCode : ""
-            let administrativeArea = (containsPlacemark.administrativeArea != nil) ? containsPlacemark.administrativeArea : ""
-            let country = (containsPlacemark.country != nil) ? containsPlacemark.country : ""
-            println(locality)
-            println(postalCode)
-            println(administrativeArea)
-            println(country)
-                    }
-
-    }
-    func locateTweep(handle: String){
+    func locateTweep(handle: String, refreshGeneration: Int){
         TweepLocation(handle){ (result: [Double]) in
+            if self.mapRefreshGeneration != refreshGeneration {
+                return
+            }
+
             if result.count < 2 {
                 return
             }
@@ -224,6 +268,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
             // we need pictures then we are good
             TweepPicture(handle){ (result: String) in
+                if self.mapRefreshGeneration != refreshGeneration {
+                    return
+                }
+
                 var info2 = TweepAnnotation()
                 info2.setCoordinate(location2)
                 info2.title = "Info1"

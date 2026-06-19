@@ -25,6 +25,17 @@ class location_trackerTests: XCTestCase {
         // This is an example of a functional test case.
         XCTAssert(true, "Pass")
     }
+
+    func testTweepCoordinatesRejectBooleansAndInvalidRanges() {
+        XCTAssertNil(NormalizedTweepCoordinate(NSNumber(bool: true), minimum: -90, maximum: 90))
+        XCTAssertNil(NormalizedTweepCoordinate(NSNumber(double: 90.01), minimum: -90, maximum: 90))
+        XCTAssertNil(NormalizedTweepCoordinate(NSNumber(double: -180.01), minimum: -180, maximum: 180))
+    }
+
+    func testTweepCoordinatesReduceDisplayedPrecision() {
+        let coordinate = NormalizedTweepCoordinate(NSNumber(double: 51.48881507), minimum: -90, maximum: 90)
+        XCTAssertEqual(coordinate!, 51.49, accuracy: 0.000001)
+    }
     
     func testPerformanceExample() {
         // This is an example of a performance test case.

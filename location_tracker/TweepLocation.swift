@@ -4,6 +4,26 @@
 
 import Foundation
 import TwitterKit
+import Darwin
+
+private let tweepCoordinatePrecision = 100.0
+
+func NormalizedTweepCoordinate(value: AnyObject?, minimum: Double, maximum: Double) -> Double? {
+    if let number = value as? NSNumber {
+        if CFGetTypeID(number) == CFBooleanGetTypeID() {
+            return nil
+        }
+
+        let coordinate = number.doubleValue
+        if isfinite(coordinate) == 0 || coordinate < minimum || coordinate > maximum {
+            return nil
+        }
+
+        return round(coordinate * tweepCoordinatePrecision) / tweepCoordinatePrecision
+    }
+
+    return nil
+}
 
 func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
 
@@ -32,13 +52,13 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
         // send the request to those people at Twitter.
         Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
                 (response, data, connectionError) -> Void in
-                if (connectionError == nil) {
+                if let responseData = ValidatedTwitterResponseData(response, data: data, error: connectionError) {
 
                     var jsonError : NSError?
                     var coordinateResult = Array<Double>()
 
                     // setup json to contain the data
-                    let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError)
+                    let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(responseData, options: nil, error: &jsonError)
 
                     // see if the json_object is an array
                     if let json_object = json as? JSONArray {
@@ -55,10 +75,10 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
                                     // handle the coordinates
                                     if let coordinates = geo["coordinates"] as? NSArray{
                                         if coordinates.count >= 2 {
-                                            if let lat = coordinates[1] as? NSNumber {
-                                                if let lng = coordinates[0] as? NSNumber {
+                                            if let lat = NormalizedTweepCoordinate(coordinates[1], minimum: -90, maximum: 90) {
+                                                if let lng = NormalizedTweepCoordinate(coordinates[0], minimum: -180, maximum: 180) {
 
-                                                    coordinateResult = [lat.doubleValue, lng.doubleValue]
+                                                    coordinateResult = [lat, lng]
 
                                                     // don't continue to iterate one geo is fine for us
                                                     break
@@ -76,17 +96,14 @@ func TweepLocation(handle: String, completion: (result: [Double]) -> Void) {
 
                 }
                 else {
-                    println("Error: \(connectionError)")
                     completion(result: [])
                 }
         }
     }
     else {
-        println("Error: \(clientError)")
         completion(result: [])
     }
 
 
 
         }
-

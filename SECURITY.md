@@ -29,17 +29,38 @@ Helpful reports include:
 - Review found external API integrations or credential-adjacent configuration; changes in those areas should receive security-focused review before merge.
 - Review found network clients, sockets, web APIs, or service endpoints; changes in those areas should receive security-focused review before merge.
 - Review found mobile permission or privacy-sensitive data handling; changes in those areas should receive security-focused review before merge.
-- Keep Twitter/Fabric credentials out of tracked plist files and do not add
-  broad App Transport Security exceptions.
-- Remote profile images must use HTTPS and pass status, image MIME type, size,
-  and decode validation before display.
+- Keep Twitter/Fabric credentials out of tracked plist and Xcode project files,
+  do not add shell-script build phases, and do not add broad App Transport
+  Security exceptions.
+- The legacy SDK compatibility boundary treats the vendored TwitterKit,
+  Fabric, and Crashlytics binaries as historical artifacts; live use requires
+  local untracked credentials and is not covered by portable verification.
+- The historical Fabric upload build phase has been removed from the current
+  tree. Removing it does not revoke or erase the two values retained in Git
+  history; service owners must revoke both historical Fabric credentials at
+  the provider, review provider activity, or delete the retired Fabric app.
+- Remote profile-image requests and final responses must use HTTPS and pass
+  status, image MIME type, size, and decode validation before display.
+- Reused map pins must cancel obsolete profile-image tasks before accepting a
+  new annotation while retaining the annotation-identity callback guard.
+- Profile-image callbacks must match the pin's active request generation before
+  releasing task ownership or changing the rendered avatar.
+- Placemark fields and device coordinates must remain out of diagnostic logs.
+- Runtime error log privacy requires Twitter request, SDK, and authentication
+  failures to use existing fallback behavior without interpolating raw error
+  objects into device or CI logs.
+- Map refresh generation ownership requires list, location, picture, and
+  delayed reveal callbacks to match the controller's current refresh before
+  mutating annotations or loading UI state.
+- Twitter timeline coordinates must reject Boolean, non-finite, and
+  out-of-range values, then reduce accepted coordinates to two decimal places
+  before map display. The app must not request device-location authorization.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - Review found database, model, query, or persistence-related code; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
-- GitHub Actions runs `make check` with read-only repository permissions, a
-  five-minute timeout, and commit-pinned Node 24 actions so static Xcode,
-  Twitter JSON, map coordinate, and profile-image guardrails stay enforced.
-  The workflow does not execute or validate the retired vendored SDK binaries.
+- GitHub Actions runs `make check` on fixed Ubuntu 24.04 with read-only
+  repository permissions. Checkout credentials are not persisted, and the
+  workflow does not execute or validate the retired vendored SDK binaries.
 
 ## Mobile Privacy Notes
 
