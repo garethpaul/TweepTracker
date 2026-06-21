@@ -129,6 +129,26 @@ def test_historical_credential_response():
     )
 
 
+def test_generated_finder_metadata_is_excluded():
+    tracked_files = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files"],
+        check=True,
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+    finder_metadata = sorted(
+        path for path in tracked_files.stdout.splitlines() if Path(path).name == ".DS_Store"
+    )
+    require(
+        not finder_metadata,
+        f"generated Finder metadata must not be tracked: {', '.join(finder_metadata)}",
+    )
+    require(
+        ".DS_Store" in read(".gitignore").splitlines(),
+        ".gitignore must exclude Finder metadata",
+    )
+
+
 def test_hostile_mutations_are_rejected():
     mutations = (
         (
