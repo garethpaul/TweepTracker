@@ -1,5 +1,9 @@
 # Changes
 
+- Hardened portable Make verification against interpreter syntax expansion,
+  shell and Makefile identity replacement, skipped-mode flags, startup-file
+  configuration, and unsafe legacy-Xcode opt-in values.
+
 ## 2026-06-19
 
 - Validated Twitter API responses for HTTPS, 2xx status, JSON content type,

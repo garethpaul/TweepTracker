@@ -100,6 +100,11 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   declared or received bodies are cancelled before decode. Pins own suspended
   tasks before resuming them, and refresh removes annotations only after
   cancelling visible image work.
+- When invoked with the checked-in Makefile alone, verification protects its
+  repository root and shell, accepts only literal Python and `0|1` legacy-Xcode
+  overrides, and rejects skipped-mode flags, populated `MAKEFILES`, and
+  `MAKEFILE_LIST` replacement. Startup files and later caller `-f` files remain
+  outside the documented GNU Make trust boundary.
 - Twitter API JSON is parsed only after validating final HTTPS transport, 2xx
   status, JSON MIME type, and declared and received response sizes.
 - Static checks also require completed canonical plans under `docs/plans`.
@@ -178,6 +183,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   placemark and coordinate logging surfaces.
 - See `docs/plans/2026-06-14-make-root-override-protection.md` for repository-
   anchored Make verification under hostile root assignments.
+- See `docs/plans/2026-06-21-make-authority-hardening.md` for interpreter,
+  shell, flag, Makefile-identity, and legacy-Xcode opt-in authority checks.
 - See `docs/plans/2026-06-14-legacy-sdk-compatibility.md` for the checked-in
   iOS, Swift, vendored SDK, credential, and live API compatibility boundary.
 - See `docs/plans/2026-06-14-fabric-build-credential-removal.md` for the legacy
