@@ -129,6 +129,52 @@ def test_historical_credential_response():
     )
 
 
+def test_generated_finder_metadata_is_excluded():
+    tracked_files = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files"],
+        check=True,
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+    finder_metadata = sorted(
+        path for path in tracked_files.stdout.splitlines() if Path(path).name == ".DS_Store"
+    )
+    require(
+        not finder_metadata,
+        f"generated Finder metadata must not be tracked: {', '.join(finder_metadata)}",
+    )
+    finder_paths = (".DS_Store", "location_tracker/Images.xcassets/.DS_Store")
+
+    def ignored_paths():
+        return {
+            path: subprocess.run(
+                ["git", "-C", str(ROOT), "check-ignore", "--no-index", "--quiet", "--", path],
+                check=False,
+            ).returncode
+            == 0
+            for path in finder_paths
+        }
+
+    require(
+        all(ignored_paths().values()),
+        ".gitignore must effectively exclude root and nested Finder metadata",
+    )
+
+    gitignore = ROOT / ".gitignore"
+    original_gitignore = gitignore.read_text(encoding="utf-8")
+    try:
+        gitignore.write_text(
+            original_gitignore + "\n!.DS_Store\n!**/.DS_Store\n",
+            encoding="utf-8",
+        )
+        require(
+            not all(ignored_paths().values()),
+            "Finder metadata ignore contract must detect later negation rules",
+        )
+    finally:
+        gitignore.write_text(original_gitignore, encoding="utf-8")
+
+
 def test_hostile_mutations_are_rejected():
     mutations = (
         (
