@@ -90,6 +90,7 @@ build:
 
 root-test:
 	/bin/sh "$$ROOT/scripts/test-makefile-authority.sh"
+	/bin/sh "$$ROOT/scripts/test-make-wrapper.sh"
 
 verify: root-test lint test build
 

@@ -114,7 +114,7 @@ def test_legacy_xcode_is_explicitly_opt_in():
         "test and build must both require explicit legacy Xcode opt-in",
     )
     require(
-        "RUN_LEGACY_XCODE=1 make check" in readme,
+        "RUN_LEGACY_XCODE=1 ./scripts/run-make.sh check" in readme,
         "README must document the explicit historical toolchain gate",
     )
 

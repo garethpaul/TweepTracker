@@ -20,11 +20,16 @@ unbounded legacy-Xcode opt-in values.
 
 - Bound verification roots, shells, interpreter, flags, and legacy-Xcode mode.
 - Added executable adversarial regression coverage to `make check`.
-- Preserved the documented GNU Make startup and later-`-f` trust boundary.
+- Added `scripts/run-make.sh` as the trusted fixed-target boundary used by
+  hosted checks. It resolves the physical checkout, clears all five Make
+  control variables, and accepts only exact `check|lint` targets.
+- Reproduced real `-n/--eval`, `-i/--eval`, `GNUMAKEFLAGS`, `MAKEFILES`, and
+  earlier/later `-f` authority before proving the wrapper excludes them.
 
 ## Scope Boundaries
 
 No application source, vendored framework, credential file, live provider,
 location service, Xcode project, workflow, publishing, or deployment changed.
-GNU Make startup files can execute during parsing, and later caller-supplied
-`-f` files remain outside this repository authority boundary.
+Direct GNU Make invocation remains pre-wrapper caller authority: startup files,
+`GNUMAKEFLAGS`, command-line options, and earlier or later caller-supplied `-f`
+files can execute or alter behavior before this Makefile is parsed.

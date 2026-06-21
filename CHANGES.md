@@ -1,5 +1,8 @@
 # Changes
 
+- Added a sanitized fixed-target Make wrapper for hosted and contributor
+  verification, with physical-checkout resolution and regression coverage for
+  pre-parse GNU Make option, startup-file, and extra-`-f` authority.
 - Hardened portable Make verification against interpreter syntax expansion,
   shell and Makefile identity replacement, skipped-mode flags, startup-file
   configuration, and unsafe legacy-Xcode opt-in values.
