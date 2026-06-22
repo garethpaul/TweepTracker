@@ -52,13 +52,20 @@ Helpful reports include:
 - Map refresh generation ownership requires list, location, picture, and
   delayed reveal callbacks to match the controller's current refresh before
   mutating annotations or loading UI state.
+- Trusted portable verification starts at `./scripts/run-make.sh check`. The
+  wrapper resolves its physical checkout with fixed tools, accepts only exact
+  `check|lint` targets, clears `MAKEFILES`, `MAKEFLAGS`, `MFLAGS`,
+  `MAKEOVERRIDES`, and `GNUMAKEFLAGS`, and preserves literal `PYTHON` and
+  `RUN_LEGACY_XCODE=0|1` environment overrides. Direct Make options, startup
+  files, and extra `-f` files are pre-wrapper caller authority; direct
+  `make check` is therefore not the trusted entrypoint.
 - Twitter timeline coordinates must reject Boolean, non-finite, and
   out-of-range values, then reduce accepted coordinates to two decimal places
   before map display. The app must not request device-location authorization.
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - Review found database, model, query, or persistence-related code; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
-- GitHub Actions runs `make check` on fixed Ubuntu 24.04 with read-only
+- GitHub Actions runs `./scripts/run-make.sh check` on fixed Ubuntu 24.04 with read-only
   repository permissions. Checkout credentials are not persisted, and the
   workflow does not execute or validate the retired vendored SDK binaries.
 

@@ -70,14 +70,15 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 ## Running or Using the Project
 
 - Open `location_tracker.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
-- Run `make check` for portable static, contract, and mutation verification.
-  Run `RUN_LEGACY_XCODE=1 make check` only with a compatible historical Xcode;
+- Run `./scripts/run-make.sh check` for trusted portable static, contract, and
+  mutation verification. Run `RUN_LEGACY_XCODE=1 ./scripts/run-make.sh check`
+  only with a compatible historical Xcode;
   merely having a current `xcodebuild` installed does not make the Swift 2-era
   targets buildable.
 
 ## Testing and Verification
 
-- `make check` runs plist, storyboard, asset, Xcode project, Twitter JSON
+- `./scripts/run-make.sh check` runs plist, storyboard, asset, Xcode project, Twitter JSON
   parsing, HTTPS-only streaming profile-image loading, map coordinate order, Twitter login
   navigation, non-blocking map reveal timing, and no external coordinate upload
   contract checks. Static checks also require Twitter list-member request
@@ -100,10 +101,19 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   declared or received bodies are cancelled before decode. Pins own suspended
   tasks before resuming them, and refresh removes annotations only after
   cancelling visible image work.
+- `./scripts/run-make.sh check` is the trusted portable entrypoint. It resolves
+  the physical checkout with fixed system tools, accepts only exact `check` or
+  `lint` targets, clears all five GNU Make control variables, and invokes only
+  the checkout's Makefile. Literal `PYTHON` and `RUN_LEGACY_XCODE=0|1`
+  environment overrides retain their documented behavior.
+- Direct Make invocation remains caller authority before repository parsing:
+  `MAKEFILES`, `GNUMAKEFLAGS`, earlier or later `-f` files, and command-line
+  options such as `--eval`, `-n`, or `-i` can execute or alter behavior before
+  the checked-in Makefile can reject them. Use the wrapper for trusted checks.
 - Twitter API JSON is parsed only after validating final HTTPS transport, 2xx
   status, JSON MIME type, and declared and received response sizes.
 - Static checks also require completed canonical plans under `docs/plans`.
-- GitHub Actions installs Python 3.12 and runs `make check` for all branch
+- GitHub Actions installs Python 3.12 and runs `./scripts/run-make.sh check` for all branch
   pushes, pull requests, and manual runs with read-only repository permissions,
   credential-free checkout, a five-minute timeout, a fixed Ubuntu 24.04 runner,
   and commit-pinned Node 24 actions. This validates static contracts only; it
@@ -178,6 +188,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   placemark and coordinate logging surfaces.
 - See `docs/plans/2026-06-14-make-root-override-protection.md` for repository-
   anchored Make verification under hostile root assignments.
+- See `docs/plans/2026-06-21-make-authority-hardening.md` for interpreter,
+  shell, flag, Makefile-identity, and legacy-Xcode opt-in authority checks.
 - See `docs/plans/2026-06-14-legacy-sdk-compatibility.md` for the checked-in
   iOS, Swift, vendored SDK, credential, and live API compatibility boundary.
 - See `docs/plans/2026-06-14-fabric-build-credential-removal.md` for the legacy

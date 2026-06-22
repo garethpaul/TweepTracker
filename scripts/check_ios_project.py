@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT_FILE = ROOT / "location_tracker.xcodeproj/project.pbxproj"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
+MAKE_WRAPPER = ROOT / "scripts/run-make.sh"
 IMAGE_TRANSPORT_PLAN = ROOT / "docs/plans/2026-06-10-profile-image-transport.md"
 ANNOTATION_REUSE_PLAN = ROOT / "docs/plans/2026-06-10-annotation-image-reuse.md"
 LOCATION_LOG_PRIVACY_PLAN = ROOT / "docs/plans/2026-06-12-location-log-privacy.md"
@@ -253,12 +254,13 @@ def check_ci_baseline_docs():
         f"{SETUP_PYTHON_ACTION} # v6.2.0",
         "persist-credentials: false",
         'python-version: "3.12"',
-        "run: make check",
+        "run: ./scripts/run-make.sh check",
     ):
         require(contract in workflow, f"CI workflow must include {contract!r}")
     require("ubuntu-latest" not in workflow, "CI must not use a floating Ubuntu runner")
     require("branches:" not in workflow, "CI push trigger must cover all branches")
     require("pull_request_target:" not in workflow, "CI must not use pull_request_target")
+    require("run: make check" not in workflow, "CI must not bypass the sanitized Make wrapper")
     action_uses = re.findall(
         r"^\s*(?:-\s*)?uses:\s*([^@\s]+)@([^\s#]+)", workflow, flags=re.MULTILINE
     )
@@ -273,25 +275,54 @@ def check_ci_baseline_docs():
         require(re.fullmatch(r"[a-f0-9]{40}", revision), f"CI action {action} must be commit-pinned")
 
     makefile = read_text("Makefile")
-    root_declaration = "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))"
+    require(MAKE_WRAPPER.exists(), "scripts/run-make.sh is missing")
+    wrapper = MAKE_WRAPPER.read_text(encoding="utf-8")
+    for contract in (
+        "case $#:$1 in",
+        "1:check|1:lint",
+        "/usr/bin/dirname",
+        "/usr/bin/readlink -n",
+        "/bin/pwd -P",
+        "-u MAKEFILES",
+        "-u MAKEFLAGS",
+        "-u MFLAGS",
+        "-u MAKEOVERRIDES",
+        "-u GNUMAKEFLAGS",
+        '/usr/bin/make --no-print-directory -f "$ROOT_DIR/Makefile" "$1"',
+    ):
+        require(contract in wrapper, f"sanitized Make wrapper is missing: {contract}")
+    root_declaration = "override ROOT := $(REPOSITORY_ROOT)"
     root_assignments = re.findall(
         r"^(?:override\s+)?ROOT\s*[:+?]?=", makefile, re.MULTILINE
     )
     require(
-        len(root_assignments) == 1 and makefile.count(root_declaration) == 1,
-        "Makefile must contain exactly one protected repository-root declaration",
+        len(root_assignments) == 1
+        and makefile.splitlines().count(root_declaration) == 1
+        and makefile.splitlines().count("$(PUBLIC_TARGETS): override ROOT := $(REPOSITORY_ROOT)") == 1,
+        "Makefile must contain global and public-target root protection",
     )
     require(
-        makefile.count(f"{root_declaration}\nPYTHON ?= python3") == 1,
-        "Makefile must keep the protected root before the Python override",
+        makefile.count("override REPOSITORY_MAKEFILE := $(lastword $(MAKEFILE_LIST))") == 1
+        and makefile.count("override REPOSITORY_ROOT := $(abspath $(dir $(REPOSITORY_MAKEFILE)))") == 1,
+        "Makefile must derive the root from its checked-in Makefile identity",
     )
     for contract in (
-        ".PHONY: build check lint test verify",
+        ".PHONY: __repository-make-authority build check lint root-test test verify",
+        "override PYTHON := $(value PYTHON)",
+        "PYTHON must be a literal executable path, not Make syntax",
+        "RUN_LEGACY_XCODE must be the literal value 0 or 1",
+        "override SHELL := /bin/sh",
+        "MAKEFLAGS must not be overridden for repository verification",
+        "MAKEFILES must be empty; repository verification requires this Makefile to be loaded alone",
+        "MAKEFILE_LIST must not be overridden",
+        "root-test:",
+        '"$$ROOT/scripts/test-makefile-authority.sh"',
+        '"$$ROOT/scripts/test-make-wrapper.sh"',
         "test: lint",
-        "verify: lint test build",
+        "verify: root-test lint test build",
         "check: verify",
-        '$(PYTHON) "$(ROOT)/scripts/check_ios_project.py"',
-        'cd "$(ROOT)" && xcodebuild',
+        '"$$PYTHON" "$$ROOT/scripts/check_ios_project.py"',
+        'cd "$$ROOT" && xcodebuild',
     ):
         require(contract in makefile, f"Makefile must support invocation outside the repository: {contract}")
     require(
