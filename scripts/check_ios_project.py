@@ -336,10 +336,10 @@ def check_ci_baseline_docs():
     )
 
     docs = {
-        "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md", "Popped map controllers remove their navigation logo overlay."],
-        "VISION.md": ["GitHub Actions", "Popped map controllers remove their navigation logo overlay."],
-        "SECURITY.md": ["GitHub Actions", "make check", "Popped map controllers remove their navigation logo overlay."],
-        "CHANGES.md": ["GitHub Actions", "Popped map controllers remove their navigation logo overlay."],
+        "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md", "Popped map controllers invalidate asynchronous map work"],
+        "VISION.md": ["GitHub Actions", "Popped map controllers invalidate refresh callbacks"],
+        "SECURITY.md": ["GitHub Actions", "make check", "Popped map controllers invalidate refresh callbacks"],
+        "CHANGES.md": ["GitHub Actions", "cycle: map pop callback invalidation"],
     }
 
     for relative_path, required_phrases in docs.items():
@@ -364,12 +364,19 @@ def check_twitter_json_guards():
         super.viewDidDisappear(animated)
 
         if self.isMovingFromParentViewController() {
+            mapRefreshGeneration += 1
+            cancelVisiblePinImageRequests()
+            mapView.delegate = nil
             logoView?.removeFromSuperview()
         }
     }"""
     require(
         pop_logo_teardown in view_controller,
-        "ViewController must remove its navigation logo after a completed pop",
+        "ViewController must invalidate map work and remove owned UI after a completed pop",
+    )
+    require(
+        "private func cancelVisiblePinImageRequests()" in view_controller,
+        "ViewController must own visible pin image cancellation during pop teardown",
     )
     url_helper = read_text("location_tracker/URL.swift")
     twitter_response = read_text("location_tracker/TwitterResponse.swift")
@@ -567,16 +574,28 @@ def check_twitter_json_guards():
         "pinView.cancelImageRequest()",
     ):
         require(contract in view_controller, f"map refresh generation guard is missing: {contract}")
+    refresh_pin_cancellation = """if let pinView = mapView.viewForAnnotation(existingAnnotation) as? TweepPinAnnotationView {
+                    pinView.cancelImageRequest()
+                }"""
+    require(
+        refresh_pin_cancellation in view_controller,
+        "map refresh must cancel visible pin image work before annotation removal",
+    )
     require(
         view_controller.count("if self.mapRefreshGeneration != refreshGeneration") == 5,
         "list, location, picture, reveal, and refresh callbacks must reject stale generations",
     )
+    setup_map = view_controller.split("func setupMap(){", 1)[1].split("\n    func displayRefresh", 1)[0]
     require(
-        view_controller.index("mapRefreshGeneration += 1")
-        < view_controller.index("let refreshGeneration = mapRefreshGeneration")
-        < view_controller.index("for existingAnnotation in mapView.annotations")
-        < view_controller.index("self.refresh.hidden = true")
-        < view_controller.index("FindTweeps()"),
+        setup_map.count("mapRefreshGeneration += 1") == 1,
+        "setupMap must invalidate exactly one prior refresh generation",
+    )
+    require(
+        setup_map.index("mapRefreshGeneration += 1")
+        < setup_map.index("let refreshGeneration = mapRefreshGeneration")
+        < setup_map.index("for existingAnnotation in mapView.annotations")
+        < setup_map.index("self.refresh.hidden = true")
+        < setup_map.index("FindTweeps()"),
         "map refresh ownership, annotation cleanup, and UI gating must precede asynchronous work",
     )
     require(

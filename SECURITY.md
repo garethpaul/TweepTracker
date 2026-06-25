@@ -24,7 +24,8 @@ Helpful reports include:
 
 ## Project Security Posture
 
-- Popped map controllers remove their navigation logo overlay.
+- Popped map controllers invalidate refresh callbacks, cancel visible avatar
+  tasks, detach their map delegate, and remove their navigation logo overlay.
 - This repository appears to be an Apple platform application or Swift sample. The active security scope is the code and documentation on the default branch.
 - Review found authentication, token, or session-related code paths; changes in those areas should receive security-focused review before merge.
 - Review found external API integrations or credential-adjacent configuration; changes in those areas should receive security-focused review before merge.

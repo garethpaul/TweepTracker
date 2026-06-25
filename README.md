@@ -96,7 +96,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   ownership before handling an image or error.
 - A map refresh generation owns each list, location, picture, and delayed UI
   callback so an older refresh cannot repopulate or reveal the map after a
-  newer refresh has started.
+  newer refresh has started. A completed navigation pop invalidates that
+  generation, cancels visible avatar tasks, and detaches the map delegate.
 - Remote images stream through a bounded `NSURLSessionDataDelegate`; oversized
   declared or received bodies are cancelled before decode. Pins own suspended
   tasks before resuming them, and refresh removes annotations only after
@@ -137,7 +138,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Runtime error log privacy keeps raw Twitter request and authentication errors
   out of device and CI logs while preserving empty fallback completions and the
   failed-login navigation guard.
-- Popped map controllers remove their navigation logo overlay.
+- Popped map controllers invalidate asynchronous map work and remove their
+  navigation logo overlay.
 
 ## Security and Privacy Notes
 
