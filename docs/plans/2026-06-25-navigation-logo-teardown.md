@@ -11,7 +11,8 @@ controllers are created.
 
 ## Design
 
-- Remove the owned logo from its superview in `deinit`.
+- Remove the owned logo from its superview on the navigation-pop path, without
+  waiting for `deinit`; keep deallocation cleanup as a fallback.
 - Keep the existing appearance and disappearance animation behavior unchanged.
 - Require the teardown in both the static project checker and portable review
   contracts.

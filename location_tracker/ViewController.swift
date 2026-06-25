@@ -102,6 +102,11 @@ class ViewController: UIViewController, MKMapViewDelegate {
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
 
+        if self.isMovingFromParentViewController() {
+            logoView?.removeFromSuperview()
+            return
+        }
+
         // Move the logo view off screen if a new controller was pushed.
         if self.navigationController?.viewControllers.count > 1 {
             UIView.animateWithDuration(0.6, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.8, options: .CurveEaseInOut, animations: { () -> Void in

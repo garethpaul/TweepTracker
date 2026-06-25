@@ -361,8 +361,11 @@ def check_twitter_json_guards():
     picture = read_text("location_tracker/TweepPicture.swift")
     view_controller = read_text("location_tracker/ViewController.swift")
     require(
-        "deinit" in view_controller and "logoView?.removeFromSuperview()" in view_controller,
-        "ViewController must remove its navigation logo during teardown",
+        "if self.isMovingFromParentViewController() {" in view_controller and
+        "logoView?.removeFromSuperview()" in view_controller and
+        view_controller.index("if self.isMovingFromParentViewController() {") <
+        view_controller.index("if self.navigationController?.viewControllers.count > 1"),
+        "ViewController must remove its navigation logo on the pop path",
     )
     url_helper = read_text("location_tracker/URL.swift")
     twitter_response = read_text("location_tracker/TwitterResponse.swift")

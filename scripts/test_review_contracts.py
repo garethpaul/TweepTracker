@@ -92,10 +92,13 @@ def test_image_task_ownership_and_refresh_cancellation():
 
 def test_navigation_logo_teardown():
     source = read("location_tracker/ViewController.swift")
-    require("deinit" in source, "map controller must define teardown for its navigation overlay")
+    pop_teardown = """if self.isMovingFromParentViewController() {
+            logoView?.removeFromSuperview()
+            return
+        }"""
     require(
-        "logoView?.removeFromSuperview()" in source,
-        "popped map controllers must remove their logo from the navigation view",
+        pop_teardown in source,
+        "navigation pop must remove the logo without waiting for controller deallocation",
     )
 
 
