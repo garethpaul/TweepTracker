@@ -92,10 +92,13 @@ def test_image_task_ownership_and_refresh_cancellation():
 
 def test_navigation_logo_teardown():
     source = read("location_tracker/ViewController.swift")
-    pop_teardown = """if self.isMovingFromParentViewController() {
+    pop_teardown = """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
             logoView?.removeFromSuperview()
-            return
-        }"""
+        }
+    }"""
     require(
         pop_teardown in source,
         "navigation pop must remove the logo without waiting for controller deallocation",
@@ -216,14 +219,20 @@ def test_hostile_mutations_are_rejected():
         ),
         (
             "location_tracker/ViewController.swift",
-            """if self.isMovingFromParentViewController() {
+            """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
             logoView?.removeFromSuperview()
-            return
-        }""",
-            """if self.isMovingFromParentViewController() {
+        }
+    }""",
+            """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
             logoView = nil
-            return
-        }""",
+        }
+    }""",
         ),
         (
             "location_tracker.xcodeproj/project.pbxproj",
