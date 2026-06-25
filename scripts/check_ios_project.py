@@ -24,6 +24,7 @@ LEGACY_SDK_PLAN = ROOT / "docs/plans/2026-06-14-legacy-sdk-compatibility.md"
 FABRIC_CREDENTIAL_PLAN = ROOT / "docs/plans/2026-06-14-fabric-build-credential-removal.md"
 RUNTIME_ERROR_LOG_PRIVACY_PLAN = ROOT / "docs/plans/2026-06-16-runtime-error-log-privacy.md"
 MAP_REFRESH_GENERATION_PLAN = ROOT / "docs/plans/2026-06-17-map-refresh-request-generation.md"
+NAVIGATION_LOGO_TEARDOWN_PLAN = ROOT / "docs/plans/2026-06-25-navigation-logo-teardown.md"
 CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_PYTHON_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
@@ -157,6 +158,10 @@ def check_docs_plans():
     require(
         MAP_REFRESH_GENERATION_PLAN.exists(),
         "docs/plans/2026-06-17-map-refresh-request-generation.md is missing",
+    )
+    require(
+        NAVIGATION_LOGO_TEARDOWN_PLAN.exists(),
+        "docs/plans/2026-06-25-navigation-logo-teardown.md is missing",
     )
 
     plans = sorted(plan_dir.glob("*.md"))
@@ -331,10 +336,10 @@ def check_ci_baseline_docs():
     )
 
     docs = {
-        "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],
-        "VISION.md": ["GitHub Actions"],
-        "SECURITY.md": ["GitHub Actions", "make check"],
-        "CHANGES.md": ["GitHub Actions"],
+        "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md", "Popped map controllers remove their navigation logo overlay."],
+        "VISION.md": ["GitHub Actions", "Popped map controllers remove their navigation logo overlay."],
+        "SECURITY.md": ["GitHub Actions", "make check", "Popped map controllers remove their navigation logo overlay."],
+        "CHANGES.md": ["GitHub Actions", "Popped map controllers remove their navigation logo overlay."],
     }
 
     for relative_path, required_phrases in docs.items():
@@ -355,6 +360,10 @@ def check_twitter_json_guards():
     location = read_text("location_tracker/TweepLocation.swift")
     picture = read_text("location_tracker/TweepPicture.swift")
     view_controller = read_text("location_tracker/ViewController.swift")
+    require(
+        "deinit" in view_controller and "logoView?.removeFromSuperview()" in view_controller,
+        "ViewController must remove its navigation logo during teardown",
+    )
     url_helper = read_text("location_tracker/URL.swift")
     twitter_response = read_text("location_tracker/TwitterResponse.swift")
     app_delegate = read_text("location_tracker/AppDelegate.swift")

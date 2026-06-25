@@ -90,6 +90,15 @@ def test_image_task_ownership_and_refresh_cancellation():
     )
 
 
+def test_navigation_logo_teardown():
+    source = read("location_tracker/ViewController.swift")
+    require("deinit" in source, "map controller must define teardown for its navigation overlay")
+    require(
+        "logoView?.removeFromSuperview()" in source,
+        "popped map controllers must remove their logo from the navigation view",
+    )
+
+
 def test_permission_and_callback_queue_boundaries():
     plist = read("location_tracker/Info.plist")
     app_sources = "\n".join(
@@ -201,6 +210,11 @@ def test_hostile_mutations_are_rejected():
             "location_tracker/ViewController.swift",
             "pinView.cancelImageRequest()",
             "pinView.image = nil",
+        ),
+        (
+            "location_tracker/ViewController.swift",
+            "logoView?.removeFromSuperview()",
+            "logoView = nil",
         ),
         (
             "location_tracker.xcodeproj/project.pbxproj",

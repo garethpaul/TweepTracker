@@ -37,6 +37,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
     var mapRefreshGeneration = 0
 
+    deinit {
+        logoView?.removeFromSuperview()
+    }
+
 
     override func viewDidLoad() {
         super.viewDidLoad()

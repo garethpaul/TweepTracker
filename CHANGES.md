@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-25
+
+- Added deterministic navigation-overlay teardown. Popped map controllers remove their navigation logo overlay.
+- Added portable source contracts and a hostile teardown mutation.
+
 - Added a sanitized fixed-target Make wrapper for hosted and contributor
   verification, with physical-checkout resolution and regression coverage for
   pre-parse GNU Make option, startup-file, and extra-`-f` authority.
