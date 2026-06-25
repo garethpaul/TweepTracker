@@ -37,6 +37,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
 
     var mapRefreshGeneration = 0
 
+    deinit {
+        logoView?.removeFromSuperview()
+    }
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -104,6 +108,14 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 // Place the frame at the correct origin position.
                 self.logoView.frame.origin.y = -self.logoView.frame.size.height - 10
                 }, completion: nil)
+        }
+    }
+
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
+            logoView?.removeFromSuperview()
         }
     }
 

@@ -90,6 +90,21 @@ def test_image_task_ownership_and_refresh_cancellation():
     )
 
 
+def test_navigation_logo_teardown():
+    source = read("location_tracker/ViewController.swift")
+    pop_teardown = """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
+            logoView?.removeFromSuperview()
+        }
+    }"""
+    require(
+        pop_teardown in source,
+        "navigation pop must remove the logo without waiting for controller deallocation",
+    )
+
+
 def test_permission_and_callback_queue_boundaries():
     plist = read("location_tracker/Info.plist")
     app_sources = "\n".join(
@@ -201,6 +216,23 @@ def test_hostile_mutations_are_rejected():
             "location_tracker/ViewController.swift",
             "pinView.cancelImageRequest()",
             "pinView.image = nil",
+        ),
+        (
+            "location_tracker/ViewController.swift",
+            """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
+            logoView?.removeFromSuperview()
+        }
+    }""",
+            """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
+            logoView = nil
+        }
+    }""",
         ),
         (
             "location_tracker.xcodeproj/project.pbxproj",

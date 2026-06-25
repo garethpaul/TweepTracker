@@ -24,6 +24,7 @@ Priority:
 - Preserve normalized latitude/longitude order before rendering map annotations
 - Require numeric Twitter timeline coordinates before rendering map annotations
 - Require successful Twitter login sessions before map navigation
+- Popped map controllers remove their navigation logo overlay.
 - Avoid blocking map setup while waiting to reveal loaded annotations
 - Complete Twitter list lookups even when request setup or transport fails
 - Complete Twitter timeline coordinate lookups even when responses lack usable

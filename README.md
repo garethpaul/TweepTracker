@@ -137,6 +137,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Runtime error log privacy keeps raw Twitter request and authentication errors
   out of device and CI logs while preserving empty fallback completions and the
   failed-login navigation guard.
+- Popped map controllers remove their navigation logo overlay.
 
 ## Security and Privacy Notes
 
