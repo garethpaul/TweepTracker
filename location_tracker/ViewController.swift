@@ -115,7 +115,18 @@ class ViewController: UIViewController, MKMapViewDelegate {
         super.viewDidDisappear(animated)
 
         if self.isMovingFromParentViewController() {
+            mapRefreshGeneration += 1
+            cancelVisiblePinImageRequests()
+            mapView.delegate = nil
             logoView?.removeFromSuperview()
+        }
+    }
+
+    private func cancelVisiblePinImageRequests() {
+        for annotation in mapView.annotations {
+            if let pinView = mapView.viewForAnnotation(annotation) as? TweepPinAnnotationView {
+                pinView.cancelImageRequest()
+            }
         }
     }
 

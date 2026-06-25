@@ -96,12 +96,19 @@ def test_navigation_logo_teardown():
         super.viewDidDisappear(animated)
 
         if self.isMovingFromParentViewController() {
+            mapRefreshGeneration += 1
+            cancelVisiblePinImageRequests()
+            mapView.delegate = nil
             logoView?.removeFromSuperview()
         }
     }"""
     require(
         pop_teardown in source,
-        "navigation pop must remove the logo without waiting for controller deallocation",
+        "navigation pop must invalidate map work and remove owned UI",
+    )
+    require(
+        "private func cancelVisiblePinImageRequests()" in source,
+        "navigation pop must cancel visible pin image requests through an owned helper",
     )
 
 
@@ -214,8 +221,20 @@ def test_hostile_mutations_are_rejected():
         ),
         (
             "location_tracker/ViewController.swift",
-            "pinView.cancelImageRequest()",
-            "pinView.image = nil",
+            """func setupMap(){
+        mapRefreshGeneration += 1
+        let refreshGeneration = mapRefreshGeneration""",
+            """func setupMap(){
+        let refreshGeneration = mapRefreshGeneration""",
+        ),
+        (
+            "location_tracker/ViewController.swift",
+            """if let pinView = mapView.viewForAnnotation(existingAnnotation) as? TweepPinAnnotationView {
+                    pinView.cancelImageRequest()
+                }""",
+            """if let pinView = mapView.viewForAnnotation(existingAnnotation) as? TweepPinAnnotationView {
+                    pinView.image = nil
+                }""",
         ),
         (
             "location_tracker/ViewController.swift",
@@ -223,6 +242,9 @@ def test_hostile_mutations_are_rejected():
         super.viewDidDisappear(animated)
 
         if self.isMovingFromParentViewController() {
+            mapRefreshGeneration += 1
+            cancelVisiblePinImageRequests()
+            mapView.delegate = nil
             logoView?.removeFromSuperview()
         }
     }""",
@@ -230,7 +252,53 @@ def test_hostile_mutations_are_rejected():
         super.viewDidDisappear(animated)
 
         if self.isMovingFromParentViewController() {
-            logoView = nil
+            cancelVisiblePinImageRequests()
+            mapView.delegate = nil
+            logoView?.removeFromSuperview()
+        }
+    }""",
+        ),
+        (
+            "location_tracker/ViewController.swift",
+            """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
+            mapRefreshGeneration += 1
+            cancelVisiblePinImageRequests()
+            mapView.delegate = nil
+            logoView?.removeFromSuperview()
+        }
+    }""",
+            """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
+            mapRefreshGeneration += 1
+            mapView.delegate = nil
+            logoView?.removeFromSuperview()
+        }
+    }""",
+        ),
+        (
+            "location_tracker/ViewController.swift",
+            """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
+            mapRefreshGeneration += 1
+            cancelVisiblePinImageRequests()
+            mapView.delegate = nil
+            logoView?.removeFromSuperview()
+        }
+    }""",
+            """override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if self.isMovingFromParentViewController() {
+            mapRefreshGeneration += 1
+            cancelVisiblePinImageRequests()
+            logoView?.removeFromSuperview()
         }
     }""",
         ),

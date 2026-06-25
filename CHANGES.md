@@ -1,5 +1,48 @@
 # Changes
 
+## 2026-06-25T21:36:49Z — P1 correctness/privacy — cycle: map pop callback invalidation
+
+### Summary
+Closed the navigation-pop lifecycle gap so asynchronous map work cannot mutate
+a controller after it has been removed from the navigation stack.
+
+### Work completed
+- Invalidated the active map refresh generation after a completed pop.
+- Cancelled visible pin profile-image tasks and detached the map delegate.
+- Added exact source contracts and three hostile teardown mutations.
+- Updated maintenance and privacy guidance.
+
+### Threads
+- Started: navigation-pop ownership for map refresh callbacks and pin tasks.
+- Continued: refresh-vs-refresh generation guards and deterministic logo cleanup.
+- Stopped: none.
+
+### Files changed
+- `location_tracker/ViewController.swift`, checker and mutation tests,
+  documentation, and `docs/plans/2026-06-25-map-pop-callback-invalidation.md`.
+
+### Validation
+- RED: the checker rejected the missing pop-time map invalidation contract.
+- GREEN: `make check` passes eight static checks and ten review-contract tests.
+- Legacy iOS build/test remains opt-in and was not run on this host.
+- Codex review found the second generation increment could mask removal of the
+  refresh-start increment; contracts and mutation coverage now scope it to
+  `setupMap()`.
+
+### Bugs / findings
+- P1: list, location, picture, and delayed UI callbacks retained a valid
+  generation after navigation pop and could mutate removed map UI.
+- P2: visible avatar downloads continued obsolete work after the map was popped.
+- P2 review: the initial static ordering check matched the new pop increment
+  first and could miss removal of `setupMap()` invalidation.
+
+### Blockers
+- The preserved Swift 2/iOS 8 app, vendored SDKs, credentials, and live Twitter
+  APIs require a compatible historical device/toolchain and controlled account.
+
+### Next action
+- Require exact-head Codex review and hosted portable/CodeQL checks before merge.
+
 ## 2026-06-25
 
 - Added deterministic navigation-overlay teardown. Popped map controllers remove their navigation logo overlay.
