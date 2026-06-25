@@ -216,8 +216,14 @@ def test_hostile_mutations_are_rejected():
         ),
         (
             "location_tracker/ViewController.swift",
-            "logoView?.removeFromSuperview()",
-            "logoView = nil",
+            """if self.isMovingFromParentViewController() {
+            logoView?.removeFromSuperview()
+            return
+        }""",
+            """if self.isMovingFromParentViewController() {
+            logoView = nil
+            return
+        }""",
         ),
         (
             "location_tracker.xcodeproj/project.pbxproj",

@@ -360,10 +360,13 @@ def check_twitter_json_guards():
     location = read_text("location_tracker/TweepLocation.swift")
     picture = read_text("location_tracker/TweepPicture.swift")
     view_controller = read_text("location_tracker/ViewController.swift")
+    pop_logo_teardown = """if self.isMovingFromParentViewController() {
+            logoView?.removeFromSuperview()
+            return
+        }"""
     require(
-        "if self.isMovingFromParentViewController() {" in view_controller and
-        "logoView?.removeFromSuperview()" in view_controller and
-        view_controller.index("if self.isMovingFromParentViewController() {") <
+        pop_logo_teardown in view_controller and
+        view_controller.index(pop_logo_teardown) <
         view_controller.index("if self.navigationController?.viewControllers.count > 1"),
         "ViewController must remove its navigation logo on the pop path",
     )
