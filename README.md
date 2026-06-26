@@ -113,6 +113,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   the checked-in Makefile can reject them. Use the wrapper for trusted checks.
 - Twitter API JSON is parsed only after validating final HTTPS transport, 2xx
   status, JSON MIME type, and declared and received response sizes.
+- User lookups select Twitter's documented `profile_image_url_https` field so
+  valid avatars remain compatible with the HTTPS-only image downloader.
 - Static checks also require completed canonical plans under `docs/plans`.
 - GitHub Actions installs Python 3.12 and runs `./scripts/run-make.sh check` for all branch
   pushes, pull requests, and manual runs with read-only repository permissions,

@@ -43,6 +43,8 @@ Helpful reports include:
   the provider, review provider activity, or delete the retired Fabric app.
 - Remote profile-image requests and final responses must use HTTPS and pass
   status, image MIME type, size, and decode validation before display.
+- User-object parsing must select `profile_image_url_https` and must not restore
+  the deprecated non-HTTPS avatar field.
 - Reused map pins must cancel obsolete profile-image tasks before accepting a
   new annotation while retaining the annotation-identity callback guard.
 - Profile-image callbacks must match the pin's active request generation before
