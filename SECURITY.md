@@ -53,6 +53,9 @@ Helpful reports include:
 - Runtime error log privacy requires Twitter request, SDK, and authentication
   failures to use existing fallback behavior without interpolating raw error
   objects into device or CI logs.
+- Treat remote list-member handles as untrusted: trim them, require 1–15 ASCII
+  letters/digits/underscores, and deduplicate the final remote/configured set
+  before issuing per-handle timeline or profile-image requests.
 - Map refresh generation ownership requires list, location, picture, and
   delayed reveal callbacks to match the controller's current refresh before
   mutating annotations or loading UI state.

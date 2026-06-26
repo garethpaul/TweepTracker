@@ -1,5 +1,39 @@
 # Changes
 
+## 2026-06-26T12:33:37Z — P1 resilience/privacy — cycle: remote handle normalization
+
+### Summary
+Applied the existing bounded Twitter handle policy to untrusted remote list
+members before the app fans out timeline and profile-image requests.
+
+### Work completed
+- Extracted a shared Swift 2-compatible handle-array normalizer.
+- Kept configured supplemental handles on the same policy.
+- Normalized and case-insensitively deduplicated the final remote/configured
+  handle list while preserving first-seen order.
+- Added focused XCTest text contracts and a thirteenth hostile mutation.
+- Updated security, contributor, operator, roadmap, and implementation guidance.
+
+### Threads
+- None; the focused list-to-request boundary was implemented directly.
+
+### Files changed
+- `location_tracker/FindTweeps.swift` — shared policy and final fan-out boundary.
+- `location_trackerTests/location_trackerTests.swift` — malformed and duplicate
+  remote handle cases.
+- `scripts/check_ios_project.py` and `scripts/test_review_contracts.py` — static,
+  focused, and hostile-mutation contracts.
+- `README.md`, `SECURITY.md`, `VISION.md`, and `AGENTS.md` — maintained guidance.
+- `docs/plans/2026-06-26-remote-handle-normalization.md` — completed evidence.
+
+### Validation
+- RED: the focused review contract rejected the missing shared normalizer.
+- GREEN: 13 review contracts and eight static project checks passed.
+- Repository-root and external-root Make gates reject 13 hostile mutations.
+
+### Blockers
+- Live Twitter APIs and a compatible Swift 2/iOS toolchain remain unverified.
+
 ## 2026-06-25 20:24 - P2 - Configure supplemental demo handles
 
 ### Summary

@@ -56,6 +56,8 @@ Priority:
   settings, Swift 2-era source, vendored binaries, and unverified live APIs
 - Keep supplemental demo users in validated checked-in app configuration
   rather than embedding account handles in production source
+- Apply the same bounded handle policy to remote list members before per-user
+  request fan-out
 
 Next priorities:
 

@@ -73,6 +73,26 @@ def test_supplemental_handles_are_configured():
         require(contract in tests, f"supplemental handle tests must retain: {contract}")
 
 
+def test_remote_handles_share_normalization():
+    source = read("location_tracker/FindTweeps.swift")
+    require(
+        "func NormalizedTweepHandles(handles: [String]) -> [String]" in source,
+        "remote and configured handles must share one production normalizer",
+    )
+    require(
+        "completion(result: NormalizedTweepHandles(userArray))" in source,
+        "combined remote and configured handles must be normalized before fan-out",
+    )
+    tests = read("location_trackerTests/location_trackerTests.swift")
+    for contract in (
+        "testTweepHandlesRejectMalformedRemoteValues",
+        "testTweepHandlesDeduplicateRemoteAndSupplementalValues",
+        '"RemoteUser"',
+        '"remoteuser"',
+    ):
+        require(contract in tests, f"shared handle tests must retain: {contract}")
+
+
 def test_coordinate_privacy_boundary():
     source = read("location_tracker/TweepLocation.swift")
     for contract in (
@@ -243,6 +263,11 @@ def test_generated_finder_metadata_is_excluded():
 
 def test_hostile_mutations_are_rejected():
     mutations = (
+        (
+            "location_tracker/FindTweeps.swift",
+            "completion(result: NormalizedTweepHandles(userArray))",
+            "completion(result: userArray)",
+        ),
         (
             "location_tracker/FindTweeps.swift",
             "NormalizedSupplementalTweepHandles(configuredSupplementalHandles)",

@@ -5,19 +5,15 @@
 import Foundation
 import TwitterKit
 
-func NormalizedSupplementalTweepHandles(value: AnyObject?) -> [String] {
-    guard let configuredHandles = value as? [String] else {
-        return []
-    }
-
+func NormalizedTweepHandles(handles: [String]) -> [String] {
     let invalidCharacters = NSCharacterSet(
         charactersInString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
     ).invertedSet
     var normalizedHandles = Array<String>()
     var seenHandles = Set<String>()
 
-    for configuredHandle in configuredHandles {
-        let handle = configuredHandle.stringByTrimmingCharactersInSet(
+    for candidateHandle in handles {
+        let handle = candidateHandle.stringByTrimmingCharactersInSet(
             NSCharacterSet.whitespaceAndNewlineCharacterSet()
         )
         if handle.isEmpty || handle.characters.count > 15 ||
@@ -35,6 +31,14 @@ func NormalizedSupplementalTweepHandles(value: AnyObject?) -> [String] {
     }
 
     return normalizedHandles
+}
+
+func NormalizedSupplementalTweepHandles(value: AnyObject?) -> [String] {
+    guard let configuredHandles = value as? [String] else {
+        return []
+    }
+
+    return NormalizedTweepHandles(configuredHandles)
 }
 
 func FindTweeps(completion: (result: [String]) -> Void) {
@@ -102,7 +106,7 @@ func FindTweeps(completion: (result: [String]) -> Void) {
                 )
 
                 // On completed send the userArray back to the ViewController.
-                completion(result: userArray)
+                completion(result: NormalizedTweepHandles(userArray))
             }
 
             else {

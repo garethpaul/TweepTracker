@@ -51,6 +51,20 @@ class location_trackerTests: XCTestCase {
             ["logicalarthur", "valid_name"]
         )
     }
+
+    func testTweepHandlesRejectMalformedRemoteValues() {
+        XCTAssertEqual(
+            NormalizedTweepHandles(["", "@invalid", "name-with-dash", "abcdefghijklmnop"]),
+            []
+        )
+    }
+
+    func testTweepHandlesDeduplicateRemoteAndSupplementalValues() {
+        XCTAssertEqual(
+            NormalizedTweepHandles([" RemoteUser ", "remoteuser", "configured_user"]),
+            ["RemoteUser", "configured_user"]
+        )
+    }
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
