@@ -39,14 +39,14 @@ func TweepPicture(handle: String, completion: (result: String) -> Void) {
                 // Setup json to contain the JSON object returned by the API
                 let json : AnyObject? = NSJSONSerialization.JSONObjectWithData(responseData, options: nil, error: &jsonError)
 
-                // find the profile image from the json object e.g. {"profile_image_url": ...}
+                // find the HTTPS profile image from the json object
                 if let jsonObject = json as? JSONDictionary {
-                    if let foundProfileImageURL = jsonObject["profile_image_url"] as? String {
+                    if let foundProfileImageURL = jsonObject["profile_image_url_https"] as? String {
                         profileImageURL = foundProfileImageURL
                     }
                 }
 
-                // Complete and return the profile_image_url back.
+                // Complete and return the HTTPS profile image URL back.
                 completion(result: profileImageURL)
             }
 

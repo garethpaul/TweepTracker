@@ -507,6 +507,14 @@ def check_twitter_json_guards():
         "profile image JSON must guard the profile image URL",
     )
     require(
+        'jsonObject["profile_image_url_https"] as? String' in picture,
+        "profile image JSON must select the documented HTTPS avatar field",
+    )
+    require(
+        'jsonObject["profile_image_url"] as? String' not in picture,
+        "profile image JSON must not restore the deprecated HTTP avatar field",
+    )
+    require(
         'var profileImageURL = ""' in picture,
         "profile image lookup must keep an empty fallback result",
     )

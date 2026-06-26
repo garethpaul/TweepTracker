@@ -1,5 +1,26 @@
 # Changes
 
+## 2026-06-26T03:14:02Z — P1 correctness — cycle: HTTPS avatar field
+
+### Summary
+Restored profile-image loading by aligning Twitter user-object parsing with the
+app's existing HTTPS-only image transport.
+
+### Work completed
+- Switched avatar parsing from deprecated `profile_image_url` to the documented
+  `profile_image_url_https` field.
+- Added source contracts and a hostile mutation that reject regression to the
+  non-HTTPS field.
+- Documented the transport invariant and focused design decision.
+
+### Validation
+- RED: the static checker rejected the parser while it selected the old field.
+- GREEN: portable verification passes after selecting the HTTPS field.
+- Exact-head Codex review was attempted but could not authenticate to the
+  OpenAI API (`401 Unauthorized`); manual diff review found no issues.
+- Hosted portable checks and CodeQL Actions/Python analysis passed.
+- Legacy Xcode execution remains opt-in and was not run on this host.
+
 ## 2026-06-25T21:36:49Z — P1 correctness/privacy — cycle: map pop callback invalidation
 
 ### Summary

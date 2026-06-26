@@ -72,6 +72,18 @@ def test_bounded_profile_image_transport():
     )
 
 
+def test_profile_image_parser_selects_https_field():
+    source = read("location_tracker/TweepPicture.swift")
+    require(
+        'jsonObject["profile_image_url_https"] as? String' in source,
+        "profile image parser must select Twitter's HTTPS avatar field",
+    )
+    require(
+        'jsonObject["profile_image_url"] as? String' not in source,
+        "profile image parser must not select Twitter's deprecated HTTP avatar field",
+    )
+
+
 def test_image_task_ownership_and_refresh_cancellation():
     source = read("location_tracker/ViewController.swift")
     assignment = "pinView!.imageTask = imageTask"
@@ -213,6 +225,11 @@ def test_hostile_mutations_are_rejected():
             "location_tracker/URL.swift",
             "receivedData.length + data.length > maximumImageBytes",
             "receivedData.length + data.length < maximumImageBytes",
+        ),
+        (
+            "location_tracker/TweepPicture.swift",
+            'jsonObject["profile_image_url_https"] as? String',
+            'jsonObject["profile_image_url"] as? String',
         ),
         (
             "location_tracker/ViewController.swift",
