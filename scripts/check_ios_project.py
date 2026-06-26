@@ -74,6 +74,23 @@ def check_app_plist_contract():
     require(info["UILaunchStoryboardName"] == "LaunchScreen", "app must keep the launch screen reference")
     require("_" not in info["CFBundleIdentifier"], "bundle identifier must not contain underscores")
     require("NSAppTransportSecurity" not in info, "app must not weaken App Transport Security")
+    supplemental_handles = info.get("SupplementalTwitterHandles")
+    require(
+        isinstance(supplemental_handles, list),
+        "app configuration must expose SupplementalTwitterHandles as an array",
+    )
+    require(
+        all(isinstance(handle, str) for handle in supplemental_handles),
+        "configured supplemental handles must all be strings",
+    )
+    require(
+        all(re.fullmatch(r"[A-Za-z0-9_]{1,15}", handle) for handle in supplemental_handles),
+        "configured supplemental handles must already use the accepted normalized form",
+    )
+    require(
+        len({handle.lower() for handle in supplemental_handles}) == len(supplemental_handles),
+        "configured supplemental handles must not contain case-insensitive duplicates",
+    )
     for credential_key in (
         "FabricAPIKey",
         "TwitterKitConsumerKey",
@@ -442,6 +459,26 @@ def check_twitter_json_guards():
         find_tweeps.count("completion(result: [])") >= 2,
         "list-member request error paths must complete with an empty result",
     )
+    for contract in (
+        "func NormalizedSupplementalTweepHandles(value: AnyObject?) -> [String]",
+        "handle.characters.count > 15",
+        "handle.rangeOfCharacterFromSet(invalidCharacters) != nil",
+        "seenHandles.contains(comparisonHandle)",
+        'objectForInfoDictionaryKey(\n                    "SupplementalTwitterHandles"',
+        "userArray.appendContentsOf(\n                    NormalizedSupplementalTweepHandles(configuredSupplementalHandles)",
+    ):
+        require(contract in find_tweeps, f"supplemental handle configuration is missing: {contract}")
+    for hardcoded_handle in (
+        "logicalarthur",
+        "laurenschutte",
+        "noonisms",
+        "jeffseibert",
+        "josolennoso",
+    ):
+        require(
+            f'userArray.append("{hardcoded_handle}")' not in find_tweeps,
+            "supplemental handles must not be appended directly from production source",
+        )
     require('json![0]["geo"]' not in location, "timeline JSON must not force-unwrap the first tweet")
     require(
         'geo["coordinates"]!' not in location,

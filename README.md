@@ -128,6 +128,11 @@ When the required SDK or runtime is unavailable, use static checks and source re
 ## Configuration and Secrets
 
 - Detected references to Twitter. Keep API keys, OAuth credentials, tokens, and account-specific values in local configuration only.
+- Supplemental demo users are configured in the checked-in
+  `SupplementalTwitterHandles` array in `location_tracker/Info.plist`. Values
+  are trimmed, limited to 15 ASCII letters/digits/underscores, and deduplicated
+  case-insensitively before requests are made. Edit that array rather than
+  adding handles to `FindTweeps.swift`.
 - The checked-in app plist must not contain Twitter/Fabric consumer secrets or
   weaken App Transport Security, and the Xcode project must not contain Fabric
   upload credentials or shell-script build phases. Profile-image requests and

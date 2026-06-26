@@ -51,6 +51,9 @@
 - Detected references to Twitter. Keep API keys, OAuth credentials, tokens, and account-specific values in local configuration only.
 - Popped map controllers invalidate refresh callbacks, cancel visible avatar
   tasks, detach their map delegate, and remove their navigation logo overlay.
+- Keep supplemental demo users in the `SupplementalTwitterHandles` Info.plist
+  array and route them through `NormalizedSupplementalTweepHandles`; do not add
+  account handles directly to production Swift source.
 - This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.

@@ -5,6 +5,38 @@
 import Foundation
 import TwitterKit
 
+func NormalizedSupplementalTweepHandles(value: AnyObject?) -> [String] {
+    guard let configuredHandles = value as? [String] else {
+        return []
+    }
+
+    let invalidCharacters = NSCharacterSet(
+        charactersInString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
+    ).invertedSet
+    var normalizedHandles = Array<String>()
+    var seenHandles = Set<String>()
+
+    for configuredHandle in configuredHandles {
+        let handle = configuredHandle.stringByTrimmingCharactersInSet(
+            NSCharacterSet.whitespaceAndNewlineCharacterSet()
+        )
+        if handle.isEmpty || handle.characters.count > 15 ||
+            handle.rangeOfCharacterFromSet(invalidCharacters) != nil {
+            continue
+        }
+
+        let comparisonHandle = handle.lowercaseString
+        if seenHandles.contains(comparisonHandle) {
+            continue
+        }
+
+        seenHandles.insert(comparisonHandle)
+        normalizedHandles.append(handle)
+    }
+
+    return normalizedHandles
+}
+
 func FindTweeps(completion: (result: [String]) -> Void) {
 
     typealias JSON = AnyObject
@@ -62,12 +94,12 @@ func FindTweeps(completion: (result: [String]) -> Void) {
                     }
                 }
 
-                // The list of developer advocates is somewhat limited here are some more to append to our array
-                userArray.append("logicalarthur")
-                userArray.append("laurenschutte")
-                userArray.append("noonisms")
-                userArray.append("jeffseibert")
-                userArray.append("josolennoso")
+                let configuredSupplementalHandles = NSBundle.mainBundle().objectForInfoDictionaryKey(
+                    "SupplementalTwitterHandles"
+                )
+                userArray.appendContentsOf(
+                    NormalizedSupplementalTweepHandles(configuredSupplementalHandles)
+                )
 
                 // On completed send the userArray back to the ViewController.
                 completion(result: userArray)
@@ -83,5 +115,4 @@ func FindTweeps(completion: (result: [String]) -> Void) {
     }
 
 }
-
 

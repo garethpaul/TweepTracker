@@ -36,6 +36,21 @@ class location_trackerTests: XCTestCase {
         let coordinate = NormalizedTweepCoordinate(NSNumber(double: 51.48881507), minimum: -90, maximum: 90)
         XCTAssertEqual(coordinate!, 51.49, accuracy: 0.000001)
     }
+
+    func testSupplementalTweepHandlesRejectMissingAndMalformedConfiguration() {
+        XCTAssertEqual(NormalizedSupplementalTweepHandles(nil), [])
+        XCTAssertEqual(
+            NormalizedSupplementalTweepHandles(["", "@invalid", "name-with-dash", "abcdefghijklmnop"]),
+            []
+        )
+    }
+
+    func testSupplementalTweepHandlesTrimAndDeduplicateCaseInsensitively() {
+        XCTAssertEqual(
+            NormalizedSupplementalTweepHandles(["  logicalarthur  ", "LogicalArthur", "valid_name"]),
+            ["logicalarthur", "valid_name"]
+        )
+    }
     
     func testPerformanceExample() {
         // This is an example of a performance test case.

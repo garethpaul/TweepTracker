@@ -41,6 +41,38 @@ def test_twitter_response_boundary():
         )
 
 
+def test_supplemental_handles_are_configured():
+    source = read("location_tracker/FindTweeps.swift")
+    info = read("location_tracker/Info.plist")
+    require(
+        "SupplementalTwitterHandles" in info,
+        "supplemental demo handles must live in checked-in app configuration",
+    )
+    require(
+        "NormalizedSupplementalTweepHandles" in source,
+        "supplemental demo handles must pass through the production normalizer",
+    )
+    for legacy_handle in (
+        "logicalarthur",
+        "laurenschutte",
+        "noonisms",
+        "jeffseibert",
+        "josolennoso",
+    ):
+        require(
+            f'userArray.append("{legacy_handle}")' not in source,
+            "supplemental demo handles must not remain hardcoded in production source",
+        )
+    tests = read("location_trackerTests/location_trackerTests.swift")
+    for contract in (
+        "testSupplementalTweepHandlesRejectMissingAndMalformedConfiguration",
+        "testSupplementalTweepHandlesTrimAndDeduplicateCaseInsensitively",
+        '"@invalid"',
+        '"LogicalArthur"',
+    ):
+        require(contract in tests, f"supplemental handle tests must retain: {contract}")
+
+
 def test_coordinate_privacy_boundary():
     source = read("location_tracker/TweepLocation.swift")
     for contract in (
@@ -211,6 +243,16 @@ def test_generated_finder_metadata_is_excluded():
 
 def test_hostile_mutations_are_rejected():
     mutations = (
+        (
+            "location_tracker/FindTweeps.swift",
+            "NormalizedSupplementalTweepHandles(configuredSupplementalHandles)",
+            "configuredSupplementalHandles as! [String]",
+        ),
+        (
+            "location_tracker/Info.plist",
+            "<key>SupplementalTwitterHandles</key>",
+            "<key>UnreviewedTwitterHandles</key>",
+        ),
         (
             "location_tracker/TweepLocation.swift",
             "CFGetTypeID(number) == CFBooleanGetTypeID()",
