@@ -55,5 +55,9 @@ Status: Completed
 - GREEN: all Make aliases and external-root `make check` passed with 12 review
   contracts and 12 hostile mutations; Python parsed the app plist and verified
   the reviewed default handles.
+- Hosted Check runs `28214940238` and `28214941959` and CodeQL run
+  `28214940917` passed on the implementation head.
+- `codex-review --mode branch` selected `origin/master` but failed with OpenAI
+  API HTTP 401 and was skipped per the maintenance instruction.
 - No live Twitter request, device location, credential, or legacy Xcode build
   is claimed by the portable verification.

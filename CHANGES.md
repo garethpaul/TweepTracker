@@ -25,8 +25,12 @@ into validated checked-in app configuration without changing the sample defaults
 - GREEN: `make lint`, `make test`, `make build`, `make check`, and an
   external-root `make check` passed with 12 review contracts and 12 hostile
   mutations; the app plist parsed with the reviewed defaults.
+- Hosted Check runs `28214940238` and `28214941959` passed the portable project
+  gate; CodeQL run `28214940917` passed Actions and Python analysis.
+- The Codex review helper targeted `origin/master` but could not authenticate
+  with the OpenAI API (HTTP 401), so it was skipped per maintenance policy.
 - Local legacy Xcode execution skipped because a compatible toolchain is not
-  available; hosted project validation remains required before merge.
+  available.
 
 ### Bugs / findings
 - P2: production source embedded five account handles that should be demo data.
@@ -35,7 +39,7 @@ into validated checked-in app configuration without changing the sample defaults
 - Live Twitter APIs and a compatible legacy Xcode runtime remain unverified.
 
 ### Next action
-- Run all portable gates, exact-head review, and hosted project validation.
+- Merge the final hosted-green head and retain configurable handle validation.
 
 ## 2026-06-26T03:14:02Z — P1 correctness — cycle: HTTPS avatar field
 
