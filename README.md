@@ -133,6 +133,9 @@ When the required SDK or runtime is unavailable, use static checks and source re
   are trimmed, limited to 15 ASCII letters/digits/underscores, and deduplicated
   case-insensitively before requests are made. Edit that array rather than
   adding handles to `FindTweeps.swift`.
+- Remote list-member `screen_name` values pass through the same policy, and the
+  final combined remote/configured list is deduplicated before timeline and
+  profile-image fan-out.
 - The checked-in app plist must not contain Twitter/Fabric consumer secrets or
   weaken App Transport Security, and the Xcode project must not contain Fabric
   upload credentials or shell-script build phases. Profile-image requests and

@@ -460,14 +460,16 @@ def check_twitter_json_guards():
         "list-member request error paths must complete with an empty result",
     )
     for contract in (
+        "func NormalizedTweepHandles(handles: [String]) -> [String]",
         "func NormalizedSupplementalTweepHandles(value: AnyObject?) -> [String]",
         "handle.characters.count > 15",
         "handle.rangeOfCharacterFromSet(invalidCharacters) != nil",
         "seenHandles.contains(comparisonHandle)",
         'objectForInfoDictionaryKey(\n                    "SupplementalTwitterHandles"',
         "userArray.appendContentsOf(\n                    NormalizedSupplementalTweepHandles(configuredSupplementalHandles)",
+        "completion(result: NormalizedTweepHandles(userArray))",
     ):
-        require(contract in find_tweeps, f"supplemental handle configuration is missing: {contract}")
+        require(contract in find_tweeps, f"Twitter handle normalization is missing: {contract}")
     for hardcoded_handle in (
         "logicalarthur",
         "laurenschutte",
