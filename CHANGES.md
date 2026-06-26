@@ -16,6 +16,9 @@ app's existing HTTPS-only image transport.
 ### Validation
 - RED: the static checker rejected the parser while it selected the old field.
 - GREEN: portable verification passes after selecting the HTTPS field.
+- Exact-head Codex review was attempted but could not authenticate to the
+  OpenAI API (`401 Unauthorized`); manual diff review found no issues.
+- Hosted portable checks and CodeQL Actions/Python analysis passed.
 - Legacy Xcode execution remains opt-in and was not run on this host.
 
 ## 2026-06-25T21:36:49Z — P1 correctness/privacy — cycle: map pop callback invalidation

@@ -46,7 +46,7 @@ func TweepPicture(handle: String, completion: (result: String) -> Void) {
                     }
                 }
 
-                // Complete and return the profile_image_url back.
+                // Complete and return the HTTPS profile image URL back.
                 completion(result: profileImageURL)
             }
 
