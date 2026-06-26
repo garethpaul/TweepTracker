@@ -1,5 +1,42 @@
 # Changes
 
+## 2026-06-25 20:24 - P2 - Configure supplemental demo handles
+
+### Summary
+Moved the five supplemental Twitter demo handles out of production Swift and
+into validated checked-in app configuration without changing the sample defaults.
+
+### Work completed
+- Added a Swift 2-compatible normalizer for configured handle arrays.
+- Trimmed values, rejected malformed or overlong handles, and deduplicated them
+  case-insensitively while retaining first-seen order.
+- Added unit, static, and hostile-mutation contracts for the configuration path.
+- Updated maintainer and user guidance and completed the roadmap item.
+
+### Threads
+- None; the focused configuration boundary was implemented directly.
+
+### Files changed
+- `location_tracker/FindTweeps.swift`, `location_tracker/Info.plist`, tests,
+  static contracts, guidance, and design/implementation plans.
+
+### Validation
+- RED: the focused review contract failed because the plist key was absent.
+- GREEN: `make lint`, `make test`, `make build`, `make check`, and an
+  external-root `make check` passed with 12 review contracts and 12 hostile
+  mutations; the app plist parsed with the reviewed defaults.
+- Local legacy Xcode execution skipped because a compatible toolchain is not
+  available; hosted project validation remains required before merge.
+
+### Bugs / findings
+- P2: production source embedded five account handles that should be demo data.
+
+### Blockers
+- Live Twitter APIs and a compatible legacy Xcode runtime remain unverified.
+
+### Next action
+- Run all portable gates, exact-head review, and hosted project validation.
+
 ## 2026-06-26T03:14:02Z — P1 correctness — cycle: HTTPS avatar field
 
 ### Summary

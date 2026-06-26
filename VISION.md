@@ -54,11 +54,12 @@ Priority:
 - Keep GitHub Actions aligned with the local Python `make check` baseline
 - Keep the legacy SDK compatibility boundary explicit for iOS 8-era project
   settings, Swift 2-era source, vendored binaries, and unverified live APIs
+- Keep supplemental demo users in validated checked-in app configuration
+  rather than embedding account handles in production source
 
 Next priorities:
 
 - Add consent-oriented runtime UX before any future live geolocation feature
-- Replace hardcoded supplemental handles with configurable demo data
 - Modernize Swift only in a dedicated pass
 
 Contribution rules:
