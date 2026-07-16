@@ -18,14 +18,21 @@ def require(condition, message):
 
 def test_twitter_response_boundary():
     response = read("location_tracker/TwitterResponse.swift")
+    # Whole-construct contracts: a bare fragment cannot distinguish a live guard from a
+    # neutered one that keeps the fragment byte-identical but gates nothing.
     for contract in (
-        'response?.URL?.scheme?.lowercaseString != "https"',
-        "response as? NSHTTPURLResponse",
-        "httpResponse!.statusCode < 200",
-        "httpResponse!.statusCode >= 300",
-        'mimeType != "application/json"',
-        "expectedContentLength > Int64(maximumTwitterResponseBytes)",
-        "data.length > maximumTwitterResponseBytes",
+        """    if response?.URL?.scheme?.lowercaseString != "https" ||
+        httpResponse == nil || httpResponse!.statusCode < 200 ||
+        httpResponse!.statusCode >= 300 ||
+        (mimeType != "application/json" && mimeType != "text/json") {
+        return nil
+    }""",
+        """        if expectedContentLength > Int64(maximumTwitterResponseBytes) {
+            return nil
+        }""",
+        """    if data.length > maximumTwitterResponseBytes {
+        return nil
+    }""",
     ):
         require(contract in response, f"missing Twitter response contract: {contract}")
 
@@ -96,10 +103,17 @@ def test_remote_handles_share_normalization():
 def test_coordinate_privacy_boundary():
     source = read("location_tracker/TweepLocation.swift")
     for contract in (
-        "CFGetTypeID(number) == CFBooleanGetTypeID()",
-        "isfinite(coordinate) == 0",
-        "coordinate < minimum || coordinate > maximum",
-        "round(coordinate * tweepCoordinatePrecision) / tweepCoordinatePrecision",
+        # Whole-construct contract: each condition must gate the early return.
+        """        if CFGetTypeID(number) == CFBooleanGetTypeID() {
+            return nil
+        }
+
+        let coordinate = number.doubleValue
+        if isfinite(coordinate) == 0 || coordinate < minimum || coordinate > maximum {
+            return nil
+        }
+
+        return round(coordinate * tweepCoordinatePrecision) / tweepCoordinatePrecision""",
         "NormalizedTweepCoordinate(coordinates[1], minimum: -90, maximum: 90)",
         "NormalizedTweepCoordinate(coordinates[0], minimum: -180, maximum: 180)",
     ):
@@ -287,6 +301,54 @@ def test_hostile_mutations_are_rejected():
             "location_tracker/TwitterResponse.swift",
             "httpResponse!.statusCode >= 300",
             "httpResponse!.statusCode >= 600",
+        ),
+        # Neutering ("decoy") mutations: every asserted literal stays byte-identical,
+        # uncommented and still evaluated, but no longer gates the early return. A
+        # fragment-containment assertion cannot tell these from the live guard.
+        (
+            "location_tracker/TweepLocation.swift",
+            """        if CFGetTypeID(number) == CFBooleanGetTypeID() {
+            return nil
+        }
+
+        let coordinate = number.doubleValue
+        if isfinite(coordinate) == 0 || coordinate < minimum || coordinate > maximum {
+            return nil
+        }
+""",
+            """        let rejectsBoolean = CFGetTypeID(number) == CFBooleanGetTypeID()
+        _ = rejectsBoolean
+
+        let coordinate = number.doubleValue
+        let outOfRange = isfinite(coordinate) == 0 || coordinate < minimum || coordinate > maximum
+        _ = outOfRange
+""",
+        ),
+        (
+            "location_tracker/TwitterResponse.swift",
+            """    if response?.URL?.scheme?.lowercaseString != "https" ||
+        httpResponse == nil || httpResponse!.statusCode < 200 ||
+        httpResponse!.statusCode >= 300 ||
+        (mimeType != "application/json" && mimeType != "text/json") {
+        return nil
+    }
+""",
+            """    let rejectsResponse = response?.URL?.scheme?.lowercaseString != "https" ||
+        httpResponse == nil || httpResponse!.statusCode < 200 ||
+        httpResponse!.statusCode >= 300 ||
+        (mimeType != "application/json" && mimeType != "text/json")
+    _ = rejectsResponse
+""",
+        ),
+        (
+            "location_tracker/TwitterResponse.swift",
+            """    if data.length > maximumTwitterResponseBytes {
+        return nil
+    }
+""",
+            """    let tooLarge = data.length > maximumTwitterResponseBytes
+    _ = tooLarge
+""",
         ),
         (
             "location_tracker/URL.swift",

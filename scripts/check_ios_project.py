@@ -436,16 +436,35 @@ def check_twitter_json_guards():
             "JSONObjectWithData(responseData" in source,
             f"{relative_path} must parse only validated Twitter response data",
         )
-    for contract in (
-        'response?.URL?.scheme?.lowercaseString != "https"',
-        "response as? NSHTTPURLResponse",
-        "httpResponse!.statusCode < 200",
-        "httpResponse!.statusCode >= 300",
-        'mimeType != "application/json"',
-        "expectedContentLength > Int64(maximumTwitterResponseBytes)",
-        "data.length > maximumTwitterResponseBytes",
-    ):
-        require(contract in twitter_response, f"Twitter response guard is missing: {contract}")
+    # Pin the whole guard construct, not bare condition fragments: a fragment-only
+    # assertion stays green when the condition is kept byte-identical but no longer
+    # gates the early return (`let x = <cond>` / `_ = x`).
+    response_metadata_guard = """    let httpResponse = response as? NSHTTPURLResponse
+    let mimeType = response?.MIMEType?.lowercaseString
+    if response?.URL?.scheme?.lowercaseString != "https" ||
+        httpResponse == nil || httpResponse!.statusCode < 200 ||
+        httpResponse!.statusCode >= 300 ||
+        (mimeType != "application/json" && mimeType != "text/json") {
+        return nil
+    }"""
+    require(
+        response_metadata_guard in twitter_response,
+        "Twitter response metadata guard must reject non-HTTPS, non-2xx, and non-JSON "
+        "responses by returning nil; each condition must gate that return, not merely appear",
+    )
+    response_size_guards = """    if let expectedContentLength = response?.expectedContentLength {
+        if expectedContentLength > Int64(maximumTwitterResponseBytes) {
+            return nil
+        }
+    }
+    if data.length > maximumTwitterResponseBytes {
+        return nil
+    }"""
+    require(
+        response_size_guards in twitter_response,
+        "Twitter response size guards must reject oversized declared and actual payloads "
+        "by returning nil; each bound must gate that return, not merely appear",
+    )
 
     require(
         'json!["users"]' not in find_tweeps,
@@ -506,13 +525,23 @@ def check_twitter_json_guards():
         "coordinateResult = [lat, lng]" in location,
         "timeline coordinate lookup must store normalized coordinates before completion",
     )
-    for contract in (
-        "CFGetTypeID(number) == CFBooleanGetTypeID()",
-        "isfinite(coordinate) == 0",
-        "coordinate < minimum || coordinate > maximum",
-        "round(coordinate * tweepCoordinatePrecision) / tweepCoordinatePrecision",
-    ):
-        require(contract in location, f"coordinate privacy guard is missing: {contract}")
+    # Pin the whole guard construct, not bare condition fragments (see comment above).
+    coordinate_guards = """        if CFGetTypeID(number) == CFBooleanGetTypeID() {
+            return nil
+        }
+
+        let coordinate = number.doubleValue
+        if isfinite(coordinate) == 0 || coordinate < minimum || coordinate > maximum {
+            return nil
+        }
+
+        return round(coordinate * tweepCoordinatePrecision) / tweepCoordinatePrecision"""
+    require(
+        coordinate_guards in location,
+        "coordinate privacy guards must reject boolean, non-finite, and out-of-range values "
+        "by returning nil and then return reduced precision; each condition must gate that "
+        "return, not merely appear",
+    )
     require(
         "completion(result: coordinateResult)" in location,
         "timeline coordinate lookup must complete after parsing succeeds or finds no coordinates",
